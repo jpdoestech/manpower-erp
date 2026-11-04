@@ -86,3 +86,20 @@ Windows had 7 passing cases and one fixture failure. The runner ships Docker in
 System32, so the missing-Docker case still discovered a real CLI. Corrected only
 the fixture by retaining a copied system where.exe on an isolated PATH and removing
 its Docker stub; launchers were unchanged. Do not count that failed run as passing.
+
+## Hosted verification / delivery
+
+Corrected source `ec348a73748ddfd0c40a23bcd8df46104475317f` passes **8/8 checks**:
+
+- [Push run 41782345240](https://github.com/jpdoestech/manpower-erp/actions/runs/41782345240): Windows launchers, backend, frontend and Compose all successful.
+- [PR run 41782348413](https://github.com/jpdoestech/manpower-erp/actions/runs/41782348413): the same four jobs all successful.
+- Hosted Windows job 126416555152 reports **8 tests in 4.563s, OK**. Local suite
+  after the final fixture correction reports **8 tests in 3.613s, OK**; Ruff/mypy
+  pass for all 27 files. Only the fixture changed after original launcher delivery.
+- Existing Linux gates cover application tests, types/lint/build/audits, clean
+  migration CLI roundtrip and container authentication/health/outage/persistence.
+
+[PR #5](https://github.com/jpdoestech/manpower-erp/pull/5) is stacked on #4 at
+d8d1cd6; no merge performed. Evidence-only documentation follows the verified
+source. Real local Docker Desktop, interactive Docker password TTY and browser
+opening remain unrun; do not infer production or human security acceptance.
