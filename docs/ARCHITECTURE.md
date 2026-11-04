@@ -9,6 +9,12 @@ requirements until their roadmap slices. See `docs/OPERATIONS.md` for commands.
 React + TypeScript frontend, Python FastAPI backend, PostgreSQL, managed object storage, background task queue, Docker-based local development. Start as a modular monolith with well-defined module boundaries.
 
 ## Modules
+
+P1-02 planning is recorded in `tasks/P1-02.md` and proposed ADR-013. It separates
+legal companies/client identities from dated branch engagements, contracts/sites,
+with company-preserving FKs and explicit bootstrap scope grants. No organization
+schema/API/UI exists yet: P1-01 remains REVIEW pending human security acceptance.
+ADR-013 is not adopted or implemented; no company access or tax treatment is implied.
 identity, organizations, contracts, billing_configuration, billing_execution, payroll_imports, disbursements, approvals, invoicing, general_ledger, receivables, collections, payables, cash_bank, tax, documents, analytics, audit.
 
 ## Data model constraints

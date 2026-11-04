@@ -1,11 +1,36 @@
 # Project Status — Codex Must Maintain
 
 Last updated: 2026-11-04
-Current milestone: P1-01
-Current task status: REVIEW (expanded P1-01 local/hosted gates pass; human security acceptance pending)
+Current requested milestone: P1-02 (prerequisite audit/planning only)
+Current task status: BLOCKED at prerequisite; P1-01 remains REVIEW pending human security acceptance
 Repository inspected: YES; fetched main b3517d3, P0-02 4fd3914, P1-01 dc7fca3; clean before new branch
 Implemented code: existing P0/P1 foundations plus technical account administration/recovery follow-up; no company/finance modules
 Validated requirements: follow-up 5ca0ad3 has 6/6 hosted checks, 92 backend/13 frontend tests, migrations and Docker gates pass
+
+## P1-02 prerequisite audit and plan
+
+Latest request authorizes P1-02 subject to verified prerequisites; explicitly says
+not to bypass security acceptance or merge automatically. Fetch confirms unchanged
+main b3517d3 and feature heads 4fd3914/dc7fca3/37dbd7f. Working tree was clean.
+Inspected all three PRs and mandatory docs, actual API/security/migration/test/CI
+surfaces. Fresh connected-account diagnostics report 6/6 successful checks at each
+exact head. PR #1 targets main; #2 targets P0-02; #3 targets P1-01 foundation. All
+remain open/unmerged. P1-01 #2/#3 show No reviews; STATUS/ADRs still require human
+security acceptance. Task authorization is separate from prerequisite acceptance.
+
+Ancestry verifies the complete P0/P1 stack in 37dbd7f but not in origin/main. No
+integration or merge performed. Created feature/p1-02-organizations from 37dbd7f
+for audit/plan documents only. `tasks/P1-02.md` contains the pre-code plan, acceptance
+cases, intended files, exact prerequisite CI links and missing approval evidence.
+ADR-013 is PROPOSED ONLY; architecture/index updated without changing adopted
+company/security/tax policy. Asked for the recorded P1-01 reviewer/decision.
+
+No organization schema/migration/API/UI, grant or P1-02 automated test exists yet.
+No production work or P1-03. Matching-head hosted prerequisite results reused;
+no fresh local application-test run is claimed for these documentation edits.
+Next safe action: record actual P1-01 security acceptance, verify chosen base after
+fresh fetch, then implement P1-02 and its full automated gates. P1-03 follows only
+after completed/accepted P1-02 and separate authorization.
 
 ## Current P1-01 CR-001 follow-up
 
