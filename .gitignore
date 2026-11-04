@@ -13,6 +13,7 @@
 *.sqlite3-shm
 .tools/
 .local/
+.local-backups/
 .venv/
 __pycache__/
 .pytest_cache/

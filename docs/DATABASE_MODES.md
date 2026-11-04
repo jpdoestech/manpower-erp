@@ -30,8 +30,9 @@ SQLite files are unencrypted and unsuitable for real employee/fiscal data.
 Every SQLite connection enables foreign_keys, busy_timeout=10000ms, WAL; every
 transaction uses BEGIN IMMEDIATE with explicit service commit / close rollback.
 Reads serialize too. No application-level write retries are added. Shutdown all
-processes before file operations; don't copy just a live WAL database file. Safe
-backup/restore tooling is B, data transfer is E, neither is implemented in A.
+processes before file operations; don't copy just a live WAL database file.
+CR-002B now provides live SQLite snapshots and confirmed offline recovery; see
+LOCAL_WINDOWS_SETUP.md. Data transfer remains E and is not implemented.
 SQLite migrations require online data verification; offline SQL generation is
 explicitly rejected. PostgreSQL offline generation remains available.
 
@@ -76,10 +77,9 @@ Open http://127.0.0.1:5173. Check /api/health/live and /api/health/ready at port
 8000; sign in through the existing frontend. Ctrl+C stops each foreground process.
 The `.env.sqlite.example` is a reference, not an automatic loader. Don't overwrite
 an existing Docker `.env`. **Root setup.bat/run.bat still require Docker**; the
-full native BAT suite is phase B. The user subsequently authorized its setup/start
-slice: use **setup-local.bat** and **start-local.bat**; instructions in
-[LOCAL_WINDOWS_SETUP.md](LOCAL_WINDOWS_SETUP.md). This does not record formal A
-acceptance or complete the remaining B tools.
+native BAT suite is CR-002B: all nine commands and safety/confirmation rules are in
+[LOCAL_WINDOWS_SETUP.md](LOCAL_WINDOWS_SETUP.md). Current task/acceptance evidence
+is in tasks/CR-002B-completion.md; formal security decisions remain unchanged.
 
 From `backend`, `uv run --locked pytest -q -m "not integration"` needs no Docker
 or PostgreSQL. SQLite tests create/remove only their own temporary directories

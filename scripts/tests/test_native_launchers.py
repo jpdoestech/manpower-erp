@@ -10,6 +10,7 @@ import sys
 import tempfile
 import time
 import unittest
+from contextlib import nullcontext
 from pathlib import Path
 from unittest.mock import MagicMock, patch
 from urllib.error import HTTPError
@@ -21,6 +22,24 @@ import local  # noqa: E402
 
 
 class NativeHelper(unittest.TestCase):
+    def test_tests_do_not_receive_active_database_or_auth_configuration(self) -> None:
+        with (
+            patch.dict(
+                os.environ, DATABASE_URL="production-secret", POSTGRES_HOST="private"
+            ),
+            patch.object(local, "tools", return_value=("node", "npm")),
+            patch.object(local, "run") as run,
+        ):
+            local.test_local()
+            settings = run.call_args_list[0].kwargs["settings"]
+            self.assertNotIn("DATABASE_URL", settings)
+            self.assertNotIn("DATABASE_MODE", settings)
+            self.assertFalse(
+                any(key.startswith(("POSTGRES_", "AUTH_")) for key in settings)
+            )
+            self.assertEqual(settings["ERP_NATIVE_SMOKE"], "0")
+            self.assertEqual(os.environ["DATABASE_URL"], "production-secret")
+
     def test_environment_overrides_cloud_settings_without_modifying_parent(
         self,
     ) -> None:
@@ -81,6 +100,8 @@ class NativeHelper(unittest.TestCase):
             ]
             with (
                 patch.object(local, "ROOT", root),
+                patch("local.runtime.supervisor", return_value=nullcontext("test")),
+                patch("local.runtime.lock", return_value=nullcontext()),
                 patch.object(local, "tools", return_value=("node", "npm")),
                 patch.object(local, "require_free_ports"),
                 patch.object(local, "migrate"),
@@ -149,14 +170,33 @@ class NativeBat(unittest.TestCase):
             prefix="native bat & test-", dir=directory
         ) as name:
             repo = Path(name)
-            for filename in ("setup-local.bat", "start-local.bat"):
+            for filename in (
+                "setup-local.bat",
+                "start-local.bat",
+                "setup.bat",
+                "run.bat",
+                ".env.example",
+                "compose.yaml",
+                "stop-local.bat",
+                "test-local.bat",
+                "backup-local-db.bat",
+                "restore-local-db.bat",
+                "reset-local-db.bat",
+                "migrate-local.bat",
+                "check-local.bat",
+            ):
                 shutil.copyfile(ROOT / filename, repo / filename)
-            for folder in ("backend", "frontend", "scripts/windows"):
+            for folder in ("backend", "frontend", "scripts/windows", "scripts/tests"):
                 shutil.copytree(
                     ROOT / folder,
                     repo / folder,
                     ignore=shutil.ignore_patterns(
-                        ".venv", "node_modules", "dist", "__pycache__", ".*_cache"
+                        ".venv",
+                        "node_modules",
+                        "dist",
+                        "__pycache__",
+                        ".*_cache",
+                        ".env*",
                     ),
                 )
             uv = shutil.which("uv.exe") or str(ROOT / ".tools/Scripts/uv.exe")
@@ -181,6 +221,7 @@ class NativeBat(unittest.TestCase):
                     timeout=300,
                 )
                 self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
+                print("Native BAT verified: setup-local.bat", flush=True)
                 if iteration == 0:
                     subprocess.run(
                         [
@@ -241,6 +282,10 @@ class NativeBat(unittest.TestCase):
                         self.fail("No readiness: " + (repo / "smoke.log").read_text())
                     with urlopen("http://127.0.0.1:5173/api/health/ready") as response:
                         self.assertEqual(response.read(), b'{"status":"ready"}')
+                    print(
+                        "Native BAT verified: start-local.bat and HTTP readiness",
+                        flush=True,
+                    )
                     with urlopen("http://127.0.0.1:5173/") as response:
                         self.assertIn(b"<title>Manpower ERP</title>", response.read())
                     cookies = HTTPCookieProcessor(http.cookiejar.CookieJar())
@@ -294,10 +339,51 @@ class NativeBat(unittest.TestCase):
                         timeout=15,
                     )
                     self.assertNotEqual(collision.returncode, 0)
-                    self.assertIn("Port 8000 is already in use", collision.stderr)
+                    self.assertIn(
+                        "Another local ERP operation is active", collision.stderr
+                    )
                     with urlopen("http://127.0.0.1:5173/api/health/ready") as response:
                         self.assertEqual(response.status, 200)
+
+                    def bat(
+                        name: str, answer: str = "", argument: str = ""
+                    ) -> subprocess.CompletedProcess[str]:
+                        result = subprocess.run(
+                            [
+                                os.environ["COMSPEC"],
+                                "/d",
+                                "/c",
+                                "call",
+                                str(repo / name),
+                            ]
+                            + ([argument] if argument else []),
+                            cwd=ROOT,
+                            input=answer + "\n\n",
+                            text=True,
+                            capture_output=True,
+                            timeout=300,
+                        )
+                        self.assertEqual(
+                            result.returncode, 0, result.stdout + result.stderr
+                        )
+                        print(f"Native BAT verified: {name}", flush=True)
+                        return result
+
+                    bat("check-local.bat")
+                    bat("backup-local-db.bat")
+                    backup_files = list((repo / ".local-backups").glob("*.sqlite3"))
+                    self.assertEqual(len(backup_files), 1)
+                    saved = backup_files[0]
+                    bat("stop-local.bat")
                     process.communicate("\n", timeout=20)
+                    bat("stop-local.bat")
+                    bat("restore-local-db.bat", "RESTORE LOCAL DATA", saved.name)
+                    bat("reset-local-db.bat", "RESET LOCAL DATA")
+                    bat("restore-local-db.bat", "RESTORE LOCAL DATA", saved.name)
+                    bat("migrate-local.bat")
+                    bat("migrate-local.bat")
+                    bat("check-local.bat")
+                    bat("test-local.bat")
                     self.assertEqual(
                         process.returncode, 0, (repo / "smoke.log").read_text()
                     )

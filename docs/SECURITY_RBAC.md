@@ -9,6 +9,10 @@ SQLite is local/test only, with an unencrypted ignored file and patched WAL
 runtime; no company grants, MFA or human security acceptance are added. Unsupported
 AUTH_PROVIDER values fail until C; Supabase DB configuration is no Auth adapter.
 File/DDL owners can bypass guards; never store real employee/fiscal data locally.
+CR-002B local restore retains audit/identity UUIDs, adds a local restore event and
+revokes snapshot sessions/recovery tokens/pending account requests. It never grants
+new roles. Unencrypted ignored backups require OS-user custody (ADR-015); this is
+local recovery, not production financial rollback or human security acceptance.
 
 CR-001 adds the narrow identity-administration surfaces below (ADR-012).
 Business/scoped RBAC and financial approval remain unimplemented.
