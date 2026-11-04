@@ -13,6 +13,36 @@ Read [AGENTS.md](AGENTS.md), [the roadmap](tasks/ROADMAP.md),
 
 ## Fresh checkout with Docker
 
+On Windows, use the root BAT files after installing/starting Docker Desktop in
+Linux-container mode:
+
+1. Double-click **setup.bat**. It creates `.env` only if absent, with a random local
+   database password and matching native URL. Existing settings are preserved.
+   It builds/starts the stack, runs migrations and waits for health checks. Choose
+   Y to create an ordinary test account; username and hidden password prompts use
+   the existing operator CLI. No default account or administrator grant is created.
+2. Double-click **run.bat** on later runs. It builds/starts the same stack, waits for
+   readiness and opens [the app](http://127.0.0.1:5173). Closing the BAT window keeps
+   containers running. Rerunning setup is safe; choose N to retain existing accounts.
+
+Both scripts locate the repository regardless of the launching directory, use the
+local default Docker context, and pin `compose.yaml`, `.env` and project name
+`manpower-erp`. They do not install Docker, delete volumes or reset credentials.
+If an existing `.env` is invalid/has a blank password, edit it and rerun setup;
+changing the file does not change a password in an existing database volume.
+PowerShell generates the initial local DB secret without displaying it. Keep
+`.env` private and ignored. [Docker CLI context options](https://docs.docker.com/reference/cli/docker/)
+take precedence over context environment settings. These helpers are local tooling;
+P1-01 still awaits human security acceptance and P1-02 remains planning only.
+
+To stop this local stack while keeping its data:
+
+```powershell
+docker --context default compose -f compose.yaml --env-file .env -p manpower-erp stop
+```
+
+The equivalent manual setup follows.
+
 Install Git and Docker with Compose v2 (`docker compose version`). On Windows use
 Docker Desktop with Linux containers. Run from the repository root:
 
@@ -131,12 +161,25 @@ are the server default; disabling Secure is rejected for non-loopback origins.
 Use the configured 127.0.0.1 origin consistently. HTTPS deployment/security/MFA
 policy needs separate approval; this is not production-ready authentication.
 
-Current-head migration `0002_identity` adds only global auth users/sessions/attempt
-windows/events. Its downgrade refuses any populated identity tables and offline
+Current head `0003_account_controls` adds only identity administration/recovery to
+the global auth tables introduced in `0002_identity`. Downgrade refuses security
+history/grant loss, populated identity tables and offline
 SQL downgrades. Do not erase accounts/audit rows to bypass that guard. Restore or
 forward-fix planning is required once identity data exists. See ADR-011.
 
 ## Contributor checks (same gates as CI)
+
+The runtime API image installs with `--no-dev`; it does **not** contain pytest or
+test files. Use the native commands below for backend tests, or the GitHub Actions
+backend job with its disposable PostgreSQL service. Do not run container pytest.
+Frontend tests use the native frontend commands below or the frontend CI job.
+
+Windows BAT orchestration regression checks use the actual Windows shell with a
+disposable Docker stub (no real containers, credentials or browser are launched):
+
+```powershell
+python -m unittest discover -s scripts/tests -p test_windows_launchers.py -v
+```
 
 From `backend/`:
 

@@ -1,2 +1,3 @@
-# Auto detect text files; keep LF on every platform for consistent format checks.
+# Default to LF; Windows command launchers use CRLF.
 * text=auto eol=lf
+*.bat text eol=crlf

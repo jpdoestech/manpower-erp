@@ -1,5 +1,12 @@
 # Decision Log (ADRs Index)
 
+Windows contributor tooling (user request, 2026-11-04): keep existing Compose
+runtimes and add setup.bat/run.bat instead of another native installer/service
+manager. Pin local default Docker context/file/project, generate a DB secret only
+when .env is absent, and reuse existing hidden-prompt ordinary-account CLI. No
+default account, Super Admin/company grant or volume deletion. Plan/limits:
+WINDOWS_LOCAL_DEV.md. This does not change pending human acceptance or ADR-013.
+
 | ID | Decision | Status | Rationale | Owner |
 |---|---|---|---|---|
 | ADR-001 | React/TypeScript, FastAPI, PostgreSQL modular monolith | ADOPTED FOR INFRASTRUCTURE | Follow existing stack; production deployment remains undecided | Tech lead |

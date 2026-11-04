@@ -7,6 +7,30 @@ Repository inspected: YES; fetched main b3517d3, P0-02 4fd3914, P1-01 dc7fca3; c
 Implemented code: existing P0/P1 foundations plus technical account administration/recovery follow-up; no company/finance modules
 Validated requirements: follow-up 5ca0ad3 has 6/6 hosted checks, 92 backend/13 frontend tests, migrations and Docker gates pass
 
+## Windows local launchers — separate authorized contributor task
+
+User requested setup/run BAT files. Created feature/windows-local-launchers from
+d8d1cd6, with a separate PR planned; P1-02 remains blocked and no dependent feature
+implementation is authorized. Pre-code plan/tests: tasks/WINDOWS_LOCAL_DEV.md.
+Added setup.bat/run.bat around existing local Compose startup, safe one-time .env
+generation, optional existing ordinary-user CLI, visible errors and readiness.
+No application/migration/authorization logic changed. Windows shell regression
+tests and CI job added. Local 8 tests pass using real cmd/PowerShell with a Docker
+stub; Ruff format/lint and strict mypy pass (27 files), Compose config, actionlint
+and whitespace checks pass. Exact commands, corrected initial failures and limits
+are in tasks/WINDOWS_LOCAL_DEV.md. Local Docker Desktop
+boot/interactive Docker password TTY/browser opening remain unrun; no live startup
+claim. Existing human-review and P1-02 prerequisite states are unchanged.
+Initial hosted Linux gates passed; Windows failed because the missing-Docker test
+still discovered the runner's System32 Docker CLI. Fixture tool discovery isolated;
+launchers unchanged. Corrected source ec348a7 passes 8/8 branch/PR checks in
+[push run 41782345240](https://github.com/jpdoestech/manpower-erp/actions/runs/41782345240)
+and [PR run 41782348413](https://github.com/jpdoestech/manpower-erp/actions/runs/41782348413).
+Windows reports 8 tests in 4.563s; local final suite 8 tests in 3.613s. Existing
+Linux backend/frontend/migrations/Compose and audits pass. [PR #5](https://github.com/jpdoestech/manpower-erp/pull/5)
+is stacked on #4; no merge. Evidence docs only follow verified source. Local real
+Docker/TTY/browser paths remain unrun; human acceptance records stay pending.
+
 ## P1-02 prerequisite audit and plan
 
 The user explicitly confirmed P1-01 security acceptance has not been granted or
