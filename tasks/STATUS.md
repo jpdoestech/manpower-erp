@@ -2,10 +2,10 @@
 
 Last updated: 2026-11-04
 Current milestone: P0-01
-Current task status: REVIEW (container boot/persistence and hosted CI pending)
+Current task status: DONE (local checks and hosted CI acceptance gates passed)
 Repository inspected: YES; initial commit 99cd935, origin https://github.com/jpdoestech/manpower-erp.git
 Implemented code: P0-01 local bootstrap only; no business workflows or domain schema
-Validated requirements: Local frozen installs, static checks, API/UI tests, PostgreSQL integration, HTTP smoke, Compose configuration and CI syntax
+Validated requirements: Local frozen installs, static checks, API/UI tests, PostgreSQL integration, HTTP/browser smoke, Compose configuration, hosted CI and Docker boot/persistence
 
 ## Latest outcome
 - Read all mandatory documents and wrote `tasks/P0-01.md` before coding.
@@ -18,23 +18,23 @@ Validated requirements: Local frozen installs, static checks, API/UI tests, Post
 - ADR-001 adopted for local bootstrap only; access surface documented in SECURITY_RBAC.
 - Native HTTP smoke and browser inspection show the page and **API connected**.
   The bootstrap endpoint is static metadata, not a DB health check.
-- All final runnable local checks pass. P0-01 is **not DONE**: no Docker engine is
-  available, and no hosted CI execution has been performed. No commit/push/deploy
-  was made during implementation. The user subsequently authorized commit/push;
-  see Git history for delivery. Production deployment remains unauthorized.
+- All runnable local checks pass. The user subsequently authorized commit/push;
+  implementation commit `f0c60ea0fed74edb56ba29bd29419a151b8be828` was pushed to main.
+- Hosted [CI run 41749669989](https://github.com/jpdoestech/manpower-erp/actions/runs/41749669989)
+  completed successfully on 2026-11-04: **backend**, **frontend**, and **compose**
+  jobs all passed. Docker build/start, HTTP smoke and database volume persistence
+  are now verified on the Linux runner. P0-01 is DONE; no P0-02 work started.
+- No production deployment or production data changes were performed.
 
 ## Next Codex actions
-1. Finish P0-01 gates on a Docker-enabled host: Compose clean build/start, HTTP smoke
-   and volume persistence. The CI Compose job encodes these checks.
-2. Observe an actual GitHub CI run after the changes are published by an authorized
-   user; commit/push now has standing user authorization. Do not treat static
-   workflow validation as a hosted pass.
-3. Only after P0-01 is accepted, P0-02 is next. It was not started here.
+1. P0-02 is next and was not started here. Wait for a request to begin it.
+2. Local container execution still needs Docker Desktop/engine; the same Compose
+   gates have passed on hosted CI. Standing user authorization covers commit/push.
 
 ## Task evidence log
 | Task | Date | Change / commit | Checks executed | Result | Reviewer |
 |---|---|---|---|---|---|
-| P0-01 | 2026-11-04 | Working tree; no new commit | Commands below and `tasks/P0-01.md` | Local gates pass; Docker engine/hosted CI pending | Not yet reviewed |
+| P0-01 | 2026-11-04 | f0c60ea; pushed to main | Commands below, `tasks/P0-01.md`, CI run 41749669989 | PASS; all acceptance gates, including hosted Docker boot/persistence | Automated checks; no human review claimed |
 
 ## Exact verification commands and results
 
@@ -67,6 +67,9 @@ was selected using `$env:UV_PROJECT_ENVIRONMENT='../.local/clean-backend'`.
 | root | `.\.tools\actionlint\actionlint.exe -color .github/workflows/ci.yml` | PASS; actionlint 1.7.12 exits 0; no hosted execution implied |
 | root | `git diff --check` | PASS; exit 0 |
 | root | `git check-ignore .env .local/p0-01-postgres-data/PG_VERSION backend/.venv/pyvenv.cfg frontend/node_modules/react/package.json .tools/docker-compose.exe` | PASS; all ignored |
+| hosted CI | `backend` job: locked install, Ruff, mypy, API tests, PostgreSQL integration, pip-audit | PASS; run 41749669989, job 126311356836 |
+| hosted CI | `frontend` job: npm ci, format/lint/types/tests/build/audit | PASS; run 41749669989, job 126311356732 |
+| hosted CI | `compose` job: `docker compose config --quiet`, `docker compose up --build --wait --wait-timeout 180`, HTML/proxy assertions, `docker compose down`, `docker compose up --wait --wait-timeout 180`, cluster identifier comparison | PASS; run 41749669989, job 126311356501; test volume cleaned up |
 
 Database test environment: `$env:DATABASE_URL='postgresql://postgres@127.0.0.1:55432/postgres'`.
 An isolated cluster was initialized under ignored `.local/p0-01-postgres-data`
@@ -113,8 +116,8 @@ inspection passed using psycopg. No failed check is counted as a pass.
 - Confirm company scope and branch establishment registration model.
 - Confirm exact document series and invoice design with tax reviewer.
 - Local Docker engine absent; container builds, volume persistence and Linux runtime
-  remain unverified here. Hosted CI and branch protection are not configured/verified
-  remotely. Workflow and remote URL exist; commit/push explicitly authorized by user.
+  passed on hosted CI. Windows Docker Desktop execution remains unverified. Branch
+  protection is not configured/verified. Commit/push explicitly authorized by user.
 - Production deployment/secrets remain undecided. Base image tags can receive patches;
   this is locked language dependency installation, not byte-reproducible OS images.
 
