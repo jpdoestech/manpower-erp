@@ -2,10 +2,10 @@
 
 Last updated: 2026-11-04
 Current milestone: P1-01
-Current task status: REVIEW (local checks pass; hosted CI and human security acceptance pending)
+Current task status: REVIEW (local/hosted checks pass; human security acceptance pending)
 Repository inspected: YES; all remotes fetched; main b3517d3 and P0-02 branch 4fd3914; P1-01 stacked on verified P0-02
 Implemented code: P0-01/P0-02 plus global password users, revocable sessions, auth audit, CLI and account UI; no company/finance modules
-Validated requirements: P0-02 reverified against code/36 tests/exact-head GitHub checks; P1-01 local authentication/migration/security/UI checks pass; hosted gate pending
+Validated requirements: P0-02 reverified against code/36 tests/exact-head GitHub checks; P1-01 local and hosted authentication/migration/security/UI/Compose gates pass
 
 ## Current P1-01 outcome
 
@@ -27,6 +27,14 @@ Validated requirements: P0-02 reverified against code/36 tests/exact-head GitHub
   MFA implementation, memberships/RLS/RBAC, approval or accounting workflows.
 - Native HTTP smoke passed login/me/logout/replay through Vite/API on a generated
   disposable preview DB; browser verified bootstrap API connected and labelled form.
+- Implementation `3e4bc828b5d0fbb9570b710576ceb51643fc6cb9` pushed to the stacked
+  branch; [PR #2](https://github.com/jpdoestech/manpower-erp/pull/2) is open into
+  feature/p0-02-infrastructure. PR #1 remains open into main. Neither was merged.
+- Hosted [push CI 41759481411](https://github.com/jpdoestech/manpower-erp/actions/runs/41759481411)
+  and [PR CI 41759551633](https://github.com/jpdoestech/manpower-erp/actions/runs/41759551633)
+  pass backend/frontend/compose for the implementation. Native servers/PG cluster
+  stopped, preview/test databases dropped, temporary credentials removed; input
+  database still has zero public tables. No production data/deploy touched.
 
 ## P1-01 verification evidence (2026-11-04)
 
@@ -51,6 +59,15 @@ the existing disposable fixture; no existing data or production migrations touch
 | `.\.tools\docker-compose.exe config --quiet` with process-local test password | PASS; includes safe cookie/origin configuration |
 | `.\.tools\actionlint\actionlint.exe .github/workflows/ci.yml` | PASS; includes auth smoke before/after container recreation |
 | `git diff --check` | PASS |
+| Push CI 41759481411: backend job 126343491301, frontend 126343490882, compose 126343491154 | PASS; all three jobs |
+| PR CI 41759551633: backend job 126343707641, frontend 126343707745, compose 126343707340 | PASS; all three jobs, compose 1m27s |
+
+Hosted gates include clean/repeated upgrade/drift/empty downgrade/re-upgrade, all
+backend/frontend checks and audits, and Docker HTTP authentication before and after
+container recreation. Original bootstrap, dependency outage/recovery and persistent
+cluster identifier checks also pass. CI evidence verified in authenticated GitHub
+UI; no credentials were extracted for API polling. Documentation-only evidence
+changes follow the verified implementation commit.
 
 All previous Python lock versions retained (tomllib comparison to 4fd3914).
 Only argon2-cffi 25.1.0, argon2-cffi-bindings 26.1.0, cffi 2.1.1, pycparser 3.12 added.
@@ -67,13 +84,18 @@ mapping blocked one CSS format write; rerun passed. No failed check counted as p
 
 ## Current next task / limits
 
-Publish/verify stacked P1-01 PR into feature/p0-02-infrastructure; merge nothing.
-P1-01 remains REVIEW for human security acceptance after CI. Recommend P1-02 only
-after that gate and separate task authorization. PR #1 remains open into main.
-Local Windows Docker engine unavailable; hosted Linux CI must prove container/auth
-persistence/outage gates. MFA, breach-password blocklist, retention/edge throttling,
+Review stacked PR #2; merge nothing automatically. After PR #1 is reviewed/merged,
+retarget #2 to main for separate security acceptance. P1-01 remains REVIEW under
+ROADMAP's human-acceptance gate for high-risk changes. Recommend P1-02 only after
+that gate and separate task authorization. PR #1 remains open into main.
+Local Windows Docker engine unavailable; hosted Linux container/auth/persistence/
+outage gates pass. MFA, breach-password blocklist, retention/edge throttling,
 production roles/RLS/IdP/recovery and calibrated policies remain security review work.
 No production readiness or financial-control certification. No production deployment.
+Non-failing inherited CI annotations: checkout@v4 Node 20 metadata is deprecated
+and GitHub forces it onto Node 24; ubuntu-latest is migrating to Ubuntu 26. These
+are recorded for focused CI maintenance, with no unrelated action/runner upgrade
+in this authentication slice. Dependency audits report zero known vulnerabilities.
 
 ## P1-01 changed files
 
@@ -206,7 +228,7 @@ P0-01's next-task handoff was P0-02, which is the current authorized task above.
 |---|---|---|---|---|---|
 | P0-01 | 2026-11-04 | f0c60ea; pushed to main | Commands below, `tasks/P0-01.md`, CI run 41749669989 | PASS; all acceptance gates, including hosted Docker boot/persistence | Automated checks; no human review claimed |
 | P0-02 | 2026-11-04 | b8e3f9e; feature branch; PR #1 | P0-02 commands above; push/PR CI 41752561626/41752609488 | PASS; local and all hosted acceptance gates | Automated checks; PR review pending, no human review claimed |
-| P1-01 | 2026-11-04 | Stacked feature branch; delivery/CI pending | Current P1-01 evidence above | Local gates pass; REVIEW pending CI and human security acceptance | No human review claimed |
+| P1-01 | 2026-11-04 | 3e4bc82; stacked PR #2 | Current P1-01 evidence, CI 41759481411/41759551633 | All local/hosted gates pass; REVIEW for human security acceptance | No human review claimed |
 
 ## Historical P0-01 verification commands and results
 

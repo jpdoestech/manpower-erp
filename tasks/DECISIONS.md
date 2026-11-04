@@ -16,6 +16,10 @@ P1-01 plan: [ADR-011](../docs/adr/ADR-011-authentication.md). Identity is separa
 from company membership and approval authority. MFA/recovery/blocklist/production
 policy remains pending security/stakeholder approval. P0-02 was reverified at exact
 head 4fd3914 before starting P1-01 on a stacked branch; PR #1 is not merged.
+P1-01 implementation `3e4bc82` is in [PR #2](https://github.com/jpdoestech/manpower-erp/pull/2).
+Local gates (73 backend/9 frontend tests) and hosted [push CI](https://github.com/jpdoestech/manpower-erp/actions/runs/41759481411)
+and [PR CI](https://github.com/jpdoestech/manpower-erp/actions/runs/41759551633) pass.
+ADR-011 remains pending human security acceptance; no production assurance implied.
 
 ## P0-02 architecture records (2026-11-04)
 
