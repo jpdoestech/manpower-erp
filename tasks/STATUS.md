@@ -1,11 +1,48 @@
 # Project Status — Codex Must Maintain
 
 Last updated: 2026-11-04
-Current requested milestone: CR-002B completion, CR-002C technical plan only
-Current task status: REVIEW; CR-002B implementation and automated gates verified
+Current requested milestone: UI-001 independent responsive ERP design system
+Current task status: REVIEW; UI-001 implementation and automated gates verified
 Repository inspected: YES; fetched main b3517d3, P0-02 4fd3914, P1-01 dc7fca3; clean before new branch
 Implemented code: existing P0/P1 foundations plus technical account administration/recovery follow-up; no company/finance modules
-Validated requirements: follow-up 5ca0ad3 has 6/6 hosted checks, 92 backend/13 frontend tests, migrations and Docker gates pass
+Validated requirements: UI-001 8c0f50c has 10/10 hosted checks; 110 unit/SQLite, 42 PG, 27 frontend, 27 browser and 30 Windows safety tests pass
+
+## UI-001 — Independent responsive frontend foundation
+
+Explicitly authorized separate branch feature/ui-001-design-system from verified
+fbaa78c (#9). Fresh fetch finds main b3517d3 and PRs #1–#9 open/unmerged (#4 draft).
+Connector reviews for #2/#3/#9 are empty; no human acceptance is manufactured.
+
+Implemented native reusable controls, keyboard tabs/modal dialogs, table/states,
+toast/skeleton patterns; validated-session shell with collapsible sidebar,
+breadcrumbs, account controls, theme, static module search and notification
+placeholder. Phones use bottom navigation/modal drawer and module lists; tablets,
+laptops and desktop use responsive rails/sidebar, cards and compact tables.
+Unavailable scope selector and administration never grant access. No backend,
+schema, credentials, production setting, business logic or auth provider change.
+
+Local frontend: 27 unit/component/auth tests, 27 browser checks across nine
+320–2560px profiles, formatting/lint/types/build/audit pass. Browser axe scans
+and focus/keyboard checks pass; phone/light and desktop/dark screenshots inspected.
+Backend 110 unit/SQLite tests pass (21.00s); Ruff/mypy pass (37 files). Exact
+commands, changed files and initial corrected failures: UI-001.md. Actual
+test-local.bat exits 0: 110 backend, launcher safety/migrations (one opt-in startup
+skip), 27 frontend. Local pip-audit hit PyPI DNS/timeout twice; hosted audit passes.
+Original local API/web listeners remain 8000:23068 and 5173:27032; no reset/stop.
+
+Design/architecture docs and ADR-016 are added; CR-002B/P1-01 acceptance is still
+pending. No merges or deployment. Physical devices, Safari/Firefox and human
+screen-reader/usability review remain unverified. UI-001 not marked DONE.
+
+Verified implementation 8c0f50c in [PR #10](https://github.com/jpdoestech/manpower-erp/pull/10)
+passes all 10 push/PR checks: [push 41853148408](https://github.com/jpdoestech/manpower-erp/actions/runs/41853148408),
+[PR 41853350250](https://github.com/jpdoestech/manpower-erp/actions/runs/41853350250).
+Real PG: 42 integration tests (12.28s), migration CLI, pip audit pass. Fresh
+Windows: all nine BAT commands, HTTP authentication and 30 safety tests pass
+(200.394s, no skips). Frontend 27 unit/auth and 27 browser checks, build/audit,
+existing Compose health/auth/dependency-recovery/persistence all pass. Evidence-only
+docs follow this source. Next: UI review; CR-002C implementation remains gated by
+B acceptance and required authentication review. No automatic next task.
 
 ## CR-002B — Completed tools, acceptance pending
 

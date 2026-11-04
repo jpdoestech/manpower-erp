@@ -27,6 +27,13 @@ Status values: TODO, IN_PROGRESS, BLOCKED, REVIEW, DONE. Each task gets a PR/cha
 
 ## Task lifecycle
 
+UI-001 is explicitly authorized as an independent frontend foundation while
+CR-002B acceptance and P1-01 security review remain pending. Plan/evidence:
+[UI-001.md](UI-001.md). Shell/primitives only; no operational hierarchy, scopes,
+accounting logic, Supabase implementation or relaxation of existing phase gates.
+Review UI-001 before operational screens; CR-002C still requires B acceptance
+and authentication review, P1-02 retains its security prerequisites.
+
 CR-002 is an explicitly authorized architectural prerequisite before further ERP
 business modules, independent of the pending P1-01 human acceptance. Execute one
 phase at a time: A database compatibility -> B Windows native tooling -> C real

@@ -2,6 +2,13 @@
 
 ## P1-01 implemented access surface
 
+UI-001 changes presentation only. Validated existing sessions render the shell;
+password/recovery/logout transport and server checks remain unchanged. No company
+contexts are fabricated; selector is unavailable pending scope APIs. System
+Administration is disabled pending server capability evidence. Static module
+previews and component reference carry no permission or data. Only theme is stored
+locally. Security acceptance remains pending; see ADR-016/frontend architecture.
+
 CR-002A preserves this matrix on opt-in local SQLite: FK enforcement, immutable
 audit UPDATE/DELETE triggers, serialized account transactions, hash-only secrets,
 live capability/session rechecks, CSRF and independent approval remain required.

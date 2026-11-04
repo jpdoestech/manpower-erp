@@ -1,4 +1,4 @@
-import { type FormEvent, useEffect, useState } from "react";
+import { type FormEvent, type ReactNode, useEffect, useState } from "react";
 import { RecoveryForm } from "./RecoveryForm";
 
 type Account = { id: string; username: string; csrf_token: string };
@@ -21,7 +21,19 @@ async function accountFrom(response: Response): Promise<Account> {
   return { id: data.id, username: data.username, csrf_token: data.csrf_token };
 }
 
-export function AuthPanel() {
+export function AuthPanel({
+  renderAuthenticated,
+  renderAnonymous,
+}: {
+  renderAuthenticated?: (
+    panel: ReactNode,
+    username: string,
+    signOut: () => void,
+    busy: boolean,
+    error: string,
+  ) => ReactNode;
+  renderAnonymous?: (panel: ReactNode) => ReactNode;
+} = {}) {
   const [account, setAccount] = useState<Account | null>(null);
   const [busy, setBusy] = useState(true);
   const [error, setError] = useState("");
@@ -127,7 +139,7 @@ export function AuthPanel() {
     }
   }
 
-  return (
+  const panel = (
     <section className="auth" aria-labelledby="account-title">
       <h2 id="account-title">Account access</h2>
       {error && <p role="alert">{error}</p>}
@@ -200,4 +212,15 @@ export function AuthPanel() {
       {!account && <RecoveryForm />}
     </section>
   );
+  return account && renderAuthenticated
+    ? renderAuthenticated(
+        panel,
+        account.username,
+        () => void signOut(),
+        busy,
+        error,
+      )
+    : !account && renderAnonymous
+      ? renderAnonymous(panel)
+      : panel;
 }

@@ -8,6 +8,12 @@ password sign-in and revocable cookie sessions; MFA is planned, not implemented.
 The P1-01 follow-up adds technical administrator approval and expiring recovery;
 see [account administration](docs/OPERATIONS.md#controlled-account-administration-p1-01).
 
+UI-001 adds a responsive light/dark workspace for phones, tablets and desktops.
+Sign in to view the shell; password management is optional under My account.
+Business modules are labeled previews; company context is unavailable until
+authorized scope APIs exist. See the [design system](docs/UI_UX_DESIGN_SYSTEM.md)
+and [frontend architecture](docs/FRONTEND_ARCHITECTURE.md).
+
 Read [AGENTS.md](AGENTS.md), [the roadmap](tasks/ROADMAP.md),
 [status/evidence](tasks/STATUS.md) and [decisions](tasks/DECISIONS.md) before changes.
 

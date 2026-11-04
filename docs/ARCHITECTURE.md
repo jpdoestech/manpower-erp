@@ -10,6 +10,10 @@ React + TypeScript frontend, Python FastAPI backend, PostgreSQL, managed object 
 
 ## Modules
 
+UI-001 introduces the independent frontend shell/design system (ADR-016).
+See FRONTEND_ARCHITECTURE.md and UI_UX_DESIGN_SYSTEM.md. No organization schema,
+scopes, financial workflow or authentication provider changes accompany it.
+
 CR-002A / ADR-014 adds opt-in local SQLite with shared ORM/Alembic history,
 UTC-aware timestamps and conservative serialized local identity transactions.
 PostgreSQL remains the production and concurrency authority. Configuration is
