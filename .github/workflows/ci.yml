@@ -70,8 +70,12 @@ jobs:
         run: |
           set -euo pipefail
           printf 'POSTGRES_PASSWORD=%s\n' "p@ss/$(openssl rand -hex 24)%#" > .env
+          printf 'AUTH_ORIGIN=http://127.0.0.1:5173\nAUTH_COOKIE_SECURE=false\n' >> .env
           docker compose config --quiet
           docker compose up --build --wait --wait-timeout 180
+          export ERP_CI_PASSWORD=$(openssl rand -hex 24)
+          docker compose exec -T -e ERP_CI_PASSWORD api .venv/bin/python -c 'import os; from sqlalchemy.orm import Session; from app.database import create_database_engine; from app.identity.service import provision_user; engine=create_database_engine(); db=Session(engine); provision_user(db, "ci-user", os.environ["ERP_CI_PASSWORD"]); db.close(); engine.dispose()'
+          python backend/tests/smoke_identity.py
           curl --fail http://127.0.0.1:5173/ | grep -q '<title>Manpower ERP</title>'
           python -c 'import json, urllib.request; assert json.load(urllib.request.urlopen("http://127.0.0.1:5173/api/bootstrap")) == {"name": "Manpower ERP", "stage": "bootstrap"}'
           python -c 'import json, urllib.request; assert json.load(urllib.request.urlopen("http://127.0.0.1:8000/api/health/live")) == {"status": "live"}; assert json.load(urllib.request.urlopen("http://127.0.0.1:5173/api/health/ready")) == {"status": "ready"}'
@@ -86,6 +90,7 @@ jobs:
           docker compose up --wait --wait-timeout 180
           after=$(docker compose exec -T db psql -U manpower -d manpower -Atc 'SELECT system_identifier FROM pg_control_system()')
           test "$before" = "$after"
+          python backend/tests/smoke_identity.py
       - if: failure()
         run: docker compose logs
       - if: always()

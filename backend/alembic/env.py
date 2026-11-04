@@ -2,6 +2,7 @@ from sqlalchemy.exc import SQLAlchemyError
 
 from alembic import context
 from app.database import Base, create_database_engine, database_url
+from app.identity import models  # noqa: F401 -- register identity metadata
 
 target_metadata = Base.metadata
 

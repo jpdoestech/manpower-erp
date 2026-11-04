@@ -4,13 +4,15 @@ import { App } from "./App";
 
 describe("bootstrap page", () => {
   it("shows loading followed by a connected API", async () => {
-    const fetchMock = vi
-      .fn()
-      .mockResolvedValue(
-        new Response(
-          JSON.stringify({ name: "Manpower ERP", stage: "bootstrap" }),
-        ),
-      );
+    const fetchMock = vi.fn((url: string) =>
+      Promise.resolve(
+        url === "/api/auth/me"
+          ? new Response("{}", { status: 401 })
+          : new Response(
+              JSON.stringify({ name: "Manpower ERP", stage: "bootstrap" }),
+            ),
+      ),
+    );
     vi.stubGlobal("fetch", fetchMock);
     render(<App />);
     expect(

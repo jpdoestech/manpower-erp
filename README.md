@@ -2,8 +2,9 @@
 
 Philippine manpower accounting ERP. P0-01 provides a local React/TypeScript page,
 FastAPI API and PostgreSQL development database. P0-02 adds SQLAlchemy sessions,
-Alembic migration history, health checks and safe JSON diagnostics. Business modules,
-authentication and accounting/tax rules are not implemented yet.
+Alembic migration history, health checks and safe JSON diagnostics. Business modules and
+accounting/tax rules are not implemented yet. P1-01 adds operator-provisioned users,
+password sign-in and revocable cookie sessions; MFA is planned, not implemented.
 
 Read [AGENTS.md](AGENTS.md), [the roadmap](tasks/ROADMAP.md),
 [status/evidence](tasks/STATUS.md) and [decisions](tasks/DECISIONS.md) before changes.
@@ -35,7 +36,8 @@ Open [the application](http://127.0.0.1:5173),
 The page should show **API connected**. That message confirms the API response;
 it does not check database readiness. Check [readiness](http://127.0.0.1:8000/api/health/ready)
 and [liveness](http://127.0.0.1:8000/api/health/live) separately. Compose runs migrations
-before API startup and probes readiness. The baseline creates only migration history.
+before API startup and probes readiness. Current head adds global identity tables;
+there are no company or financial tables.
 
 ```sh
 docker compose ps
@@ -88,6 +90,43 @@ npm run dev
 Vite proxies `/api` to `127.0.0.1:8000`, avoiding a permissive CORS configuration.
 Compose changes the internal proxy target to `http://api:8000`.
 
+## Local account access (P1-01)
+
+No default account or public signup exists. After `alembic upgrade head`, an
+authorized local operator can provision a test account from `backend/` with its
+explicitly exported local DATABASE_URL:
+
+```sh
+uv run --locked python -m app.identity.cli create-user your.username
+uv run --locked python -m app.identity.cli reset-password your.username
+uv run --locked python -m app.identity.cli deactivate-user your.username
+```
+
+For Compose: `docker compose exec api .venv/bin/python -m app.identity.cli create-user your.username`.
+Passwords are prompted twice with hidden input (15–128 characters). Never put a
+password in command arguments/history, source or logs. Usernames are normalized
+lowercase ASCII, 3–64 characters; begin with a letter, then letters/digits/._-.
+Deactivation preserves identity/audit history. Reset/deactivation revoke sessions;
+reset does not reactivate a disabled user. No operator command grants company roles.
+
+The page offers sign-in, sign-out and current-password change. Successful password
+change ends all sessions and requires sign-in again. Sessions are HttpOnly and
+SameSite=Strict; no browser localStorage token. API errors remain generic.
+Login attempts are limited across workers (5/name/15 min, 60 total/minute).
+
+For native **local HTTP** development, export `AUTH_COOKIE_SECURE=false` and
+`AUTH_ORIGIN=http://127.0.0.1:5173` before starting the API. In PowerShell use
+`$env:AUTH_COOKIE_SECURE='false'`; bash uses `export AUTH_COOKIE_SECURE=false`.
+Compose reads these from `.env.example` after you copy it to `.env`. Secure cookies
+are the server default; disabling Secure is rejected for non-loopback origins.
+Use the configured 127.0.0.1 origin consistently. HTTPS deployment/security/MFA
+policy needs separate approval; this is not production-ready authentication.
+
+Current-head migration `0002_identity` adds only global auth users/sessions/attempt
+windows/events. Its downgrade refuses any populated identity tables and offline
+SQL downgrades. Do not erase accounts/audit rows to bypass that guard. Restore or
+forward-fix planning is required once identity data exists. See ADR-011.
+
 ## Contributor checks (same gates as CI)
 
 From `backend/`:
@@ -117,7 +156,7 @@ the test-only role needs CREATE DATABASE. The original test uses a session-local
 temporary table. No ERP domain tables are created in the configured input database.
 Never point tests at production or grant database-creation rights to runtime roles.
 
-To verify the baseline CLI on an owned disposable database:
+To verify the current migration CLI on an owned **empty** disposable database:
 
 ```sh
 uv run --locked alembic upgrade head
@@ -127,8 +166,8 @@ uv run --locked alembic upgrade head
 uv run --locked alembic check
 ```
 
-The no-op baseline owns no business data; future downgrades need individual safety
-review. See [operations](docs/OPERATIONS.md) for lifecycle, configuration, migration
+The baseline owns no business data; identity downgrade refuses populated tables.
+Future downgrades need individual safety review. See [operations](docs/OPERATIONS.md) for lifecycle, configuration, migration
 rollback, health/error contracts and log-derived metrics design; see
 [ADRs](tasks/DECISIONS.md) for pending stakeholder/CPA decisions.
 

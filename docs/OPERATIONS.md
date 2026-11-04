@@ -1,6 +1,7 @@
 # Development infrastructure operations
 
-P0-02 only. No production deployment, auth, tenant data or financial workflows.
+P0-02 infrastructure plus P1-01 local authentication. No production deployment,
+company memberships, tenant business data or financial workflows.
 Infrastructure decisions are indexed in `tasks/DECISIONS.md` and `docs/adr/`.
 
 ## Database configuration and lifecycle
@@ -49,7 +50,7 @@ the API starts. Failed migration prevents API startup. Each API worker does not
 run migrations. Only one migration job should run per environment at a time.
 For an explicit rerun: `docker compose run --rm migrate`.
 
-The baseline `0001_infrastructure` owns no business objects. It initializes only
+The historical baseline `0001_infrastructure` owns no business objects. It initializes only
 `alembic_version`. Its safe downgrade removes the version row, leaves the version
 table, and never drops unrelated data:
 
@@ -58,6 +59,12 @@ uv run --locked alembic downgrade base
 uv run --locked alembic upgrade head
 uv run --locked alembic check
 ```
+
+Current head `0002_identity` creates global identity/session/attempt/audit tables.
+It allows downgrade only when all four tables are empty and checked online;
+otherwise it refuses before any drop and retains the revision/history. Never delete
+identity or audit rows just to force a downgrade. Use backup/restore or a reviewed
+forward fix after real data exists. Tests verify refusal/data preservation.
 
 Run downgrade tests only on disposable databases. Future migrations must specify
 data-preserving expand/backfill/contract steps and rollback or forward-fix limits;
@@ -80,6 +87,15 @@ manual inspection; do not blanket-delete similarly named databases.
 | GET /api/bootstrap | Existing product/stage metadata | Independent of DB | Public, no business data |
 | GET /api/health/live | 200 `{"status":"live"}` | Remains 200 during DB outage | Public, no business data |
 | GET /api/health/ready | 200 `{"status":"ready"}` after SELECT 1 | Generic 503 | Public, no DB details |
+
+For local account provisioning and native/Compose cookie configuration see README.
+P1-01 APIs: POST /api/auth/login, GET /api/auth/me, POST /api/auth/logout/password.
+Authentication events persist subject UUID, source/kind, request UUID and time;
+they are not the financial audit ledger. Retain UUIDs/history on deactivation.
+API sessions grant identity only; company membership and approval remain denied.
+Cookie/origin/CSRF, throttle and MFA/production limits are specified in ADR-011.
+Operational retention/cleanup for expired sessions, throttle windows and auth events
+requires security/DPO policy; no blanket deletion command is provided.
 
 Readiness proves a connection/query, not business schema, compliance or accounting
 readiness. CI verifies migration head separately. No probes reveal host, user,

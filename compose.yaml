@@ -21,6 +21,8 @@ services:
       context: .
       dockerfile: backend/Dockerfile
     environment: &database_environment
+      AUTH_ORIGIN: ${AUTH_ORIGIN:-http://127.0.0.1:5173}
+      AUTH_COOKIE_SECURE: ${AUTH_COOKIE_SECURE:-true}
       POSTGRES_HOST: db
       POSTGRES_USER: ${POSTGRES_USER:-manpower}
       POSTGRES_DB: ${POSTGRES_DB:-manpower}

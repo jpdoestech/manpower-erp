@@ -1,13 +1,115 @@
 # Project Status — Codex Must Maintain
 
 Last updated: 2026-11-04
-Current milestone: P0-02
-Current task status: DONE (implementation and hosted CI verified; PR open for review)
-Repository inspected: YES; feature/p0-02-infrastructure from clean main b3517d3, matching origin
-Implemented code: P0-01 bootstrap plus P0-02 sessions/migrations/health/diagnostics; no business workflows or domain schema
-Validated requirements: P0-02 local/hosted tests, migration round trips, static checks, audits, Docker clean boot/migration ordering, live/ready outage/recovery and volume persistence
+Current milestone: P1-01
+Current task status: REVIEW (local/hosted checks pass; human security acceptance pending)
+Repository inspected: YES; all remotes fetched; main b3517d3 and P0-02 branch 4fd3914; P1-01 stacked on verified P0-02
+Implemented code: P0-01/P0-02 plus global password users, revocable sessions, auth audit, CLI and account UI; no company/finance modules
+Validated requirements: P0-02 reverified against code/36 tests/exact-head GitHub checks; P1-01 local and hosted authentication/migration/security/UI/Compose gates pass
 
-## Latest outcome
+## Current P1-01 outcome
+
+- User explicitly authorized verify-and-continue. Fetch confirmed two existing local/
+  remote branches, five commits, clean worktree, open PR #1 and no open issues.
+  P0-02 existed in full on 4fd3914; main still ends at P0-01. GitHub UI confirms
+  exact-head 6/6 checks; fresh local prerequisite run passed 36 tests, Ruff/mypy,
+  pip-audit. Reviewed migrations, health/live-ready, logs/correlation/redaction,
+  sessions, docs and CI against acceptance; no missing P0-02 code found.
+- Created feature/p1-01-authentication from verified P0-02. No merge or duplication
+  of P0-02. Planned/auth decisions before coding: tasks/P1-01.md and ADR-011.
+- Added operator-only create/reset/soft-disable CLI, Argon2id, 8-hour opaque hashed
+  sessions, login/me/logout/password APIs, CSRF/Origin protection and DB attempt
+  windows. Password/reset/deactivation revoke sessions. No company/role authority.
+- Auth audit records subject UUID/event/source/correlation/time. Trigger rejects
+  UPDATE/DELETE/TRUNCATE; privileged DDL tampering is not prevented by dev setup.
+  Migration refuses populated/offline downgrade; empty roundtrip/drift checks pass.
+- Added compact account UI and MFA/security-approval plan. No signup/admin listing,
+  MFA implementation, memberships/RLS/RBAC, approval or accounting workflows.
+- Native HTTP smoke passed login/me/logout/replay through Vite/API on a generated
+  disposable preview DB; browser verified bootstrap API connected and labelled form.
+- Implementation `3e4bc828b5d0fbb9570b710576ceb51643fc6cb9` pushed to the stacked
+  branch; [PR #2](https://github.com/jpdoestech/manpower-erp/pull/2) is open into
+  feature/p0-02-infrastructure. PR #1 remains open into main. Neither was merged.
+- Hosted [push CI 41759481411](https://github.com/jpdoestech/manpower-erp/actions/runs/41759481411)
+  and [PR CI 41759551633](https://github.com/jpdoestech/manpower-erp/actions/runs/41759551633)
+  pass backend/frontend/compose for the implementation. Native servers/PG cluster
+  stopped, preview/test databases dropped, temporary credentials removed; input
+  database still has zero public tables. No production data/deploy touched.
+
+## P1-01 verification evidence (2026-11-04)
+
+Host: Python 3.13.12, uv 0.13.7, Node 24.14.1/npm 11.19.1, PostgreSQL 18.3.
+Backend commands run from backend using `..\.tools\Scripts\uv`; test DATABASE_URL
+points to loopback 55432. New integration databases are generated and dropped by
+the existing disposable fixture; no existing data or production migrations touched.
+
+| Command | Result |
+|---|---|
+| `git fetch --all --prune`, `git branch -avv`, `git log --all --oneline --decorate -15`, `git ls-remote origin 'refs/pull/*'` | PASS; main b3517d3, P0-02 4fd3914, PR #1 head matches, no pre-existing uncommitted work |
+| Prerequisite `uv sync --locked`, Ruff format/check, `mypy app tests alembic`, `pytest -q`, `pip-audit` | PASS; 36 tests, 13 typed/formatted files, audit clean |
+| P1-01 `uv run --locked ruff format --check .`, `uv run --locked ruff check .` | PASS after formatting |
+| `uv run --locked mypy app tests alembic` | PASS; 23 source files |
+| `uv run --locked pytest -q` | PASS; 73 tests in 25.50s, no warnings |
+| `uv run --locked pip-audit` / `uv lock --check` | PASS; no known vulnerabilities; graph locked |
+| `npm run format:check`, `npm run lint`, `npm run typecheck` | PASS; 11 formatted/linted files; tsc exits 0 |
+| `npm test` | PASS; 9 tests (5 original + 4 account-flow tests) |
+| `npm run build` | PASS; 17 modules, Vite 8.3.5 |
+| `npm audit --audit-level=low` | PASS; 0 vulnerabilities; frontend dependency graph unchanged |
+| `python backend/tests/smoke_identity.py` with generated preview credentials in process env | PASS; HTTP login/me/logout/replay via http://127.0.0.1:5173; no credential output |
+| `.\.tools\docker-compose.exe config --quiet` with process-local test password | PASS; includes safe cookie/origin configuration |
+| `.\.tools\actionlint\actionlint.exe .github/workflows/ci.yml` | PASS; includes auth smoke before/after container recreation |
+| `git diff --check` | PASS |
+| Push CI 41759481411: backend job 126343491301, frontend 126343490882, compose 126343491154 | PASS; all three jobs |
+| PR CI 41759551633: backend job 126343707641, frontend 126343707745, compose 126343707340 | PASS; all three jobs, compose 1m27s |
+
+Hosted gates include clean/repeated upgrade/drift/empty downgrade/re-upgrade, all
+backend/frontend checks and audits, and Docker HTTP authentication before and after
+container recreation. Original bootstrap, dependency outage/recovery and persistent
+cluster identifier checks also pass. CI evidence verified in authenticated GitHub
+UI; no credentials were extracted for API polling. Documentation-only evidence
+changes follow the verified implementation commit.
+
+All previous Python lock versions retained (tomllib comparison to 4fd3914).
+Only argon2-cffi 25.1.0, argon2-cffi-bindings 26.1.0, cffi 2.1.1, pycparser 3.12 added.
+No frontend dependency added. Current-head migration tests independently verify
+identity tables, repeat/check, empty downgrade/re-upgrade and populated refusal.
+Historical no-schema baseline regression stays explicitly on 0001_infrastructure.
+Tests also cover concurrent throttling, cookie/CSRF/Origin, cross-user self-only
+identity, token replay/expiry/deactivation/reset/change and log redaction.
+
+Initial issues corrected: the original frontend mock reused one Response body for
+multiple requests; changed to fresh route-specific responses without weakening
+bootstrap assertions. Ruff/import/test typing cleaned up. A transient Windows file
+mapping blocked one CSS format write; rerun passed. No failed check counted as pass.
+
+## Current next task / limits
+
+Review stacked PR #2; merge nothing automatically. After PR #1 is reviewed/merged,
+retarget #2 to main for separate security acceptance. P1-01 remains REVIEW under
+ROADMAP's human-acceptance gate for high-risk changes. Recommend P1-02 only after
+that gate and separate task authorization. PR #1 remains open into main.
+Local Windows Docker engine unavailable; hosted Linux container/auth/persistence/
+outage gates pass. MFA, breach-password blocklist, retention/edge throttling,
+production roles/RLS/IdP/recovery and calibrated policies remain security review work.
+No production readiness or financial-control certification. No production deployment.
+Non-failing inherited CI annotations: checkout@v4 Node 20 metadata is deprecated
+and GitHub forces it onto Node 24; ubuntu-latest is migrating to Ubuntu 26. These
+are recorded for focused CI maintenance, with no unrelated action/runner upgrade
+in this authentication slice. Dependency audits report zero known vulnerabilities.
+
+## P1-01 changed files
+
+- Auth: backend/app/identity/{__init__,models,security,service,routes,cli}.py;
+  backend/app/main.py, backend/app/observability.py, backend/pyproject.toml, uv.lock.
+- Migrations/tests: backend/alembic/env.py, versions/0002_identity.py;
+  backend/tests/test_api.py, test_migrations.py, test_identity.py,
+  test_identity_security.py, smoke_identity.py.
+- UI: frontend/src/AuthPanel.tsx, AuthPanel.test.tsx, App.tsx, App.test.tsx, style.css.
+- Delivery/docs: .env.example, compose.yaml, .github/workflows/ci.yml, README.md,
+  docs/OPERATIONS.md, SECURITY_RBAC.md, adr/ADR-011-authentication.md;
+  tasks/P1-01.md, P0-02.md, DECISIONS.md and STATUS.md.
+
+## Historical P0-02 outcome
 - P0-02 requested; clean main `b3517d3` matched origin and the reported scaffold.
   Created `feature/p0-02-infrastructure`; plan/tests are in `tasks/P0-02.md`.
   Reviewed all mandatory docs, source, lockfiles, Compose and CI; detailed ADRs
@@ -28,7 +130,7 @@ Validated requirements: P0-02 local/hosted tests, migration round trips, static 
   stopped; generated test databases cleaned up; input database has zero public
   tables. No production changes or P1-01 implementation performed.
 
-## Next task / limits
+## Historical P0-02 handoff / limits
 
 Review PR #1; do not merge automatically. Recommend **P1-01** only on a separate
 user request. No P1-01 work started.
@@ -126,6 +228,7 @@ P0-01's next-task handoff was P0-02, which is the current authorized task above.
 |---|---|---|---|---|---|
 | P0-01 | 2026-11-04 | f0c60ea; pushed to main | Commands below, `tasks/P0-01.md`, CI run 41749669989 | PASS; all acceptance gates, including hosted Docker boot/persistence | Automated checks; no human review claimed |
 | P0-02 | 2026-11-04 | b8e3f9e; feature branch; PR #1 | P0-02 commands above; push/PR CI 41752561626/41752609488 | PASS; local and all hosted acceptance gates | Automated checks; PR review pending, no human review claimed |
+| P1-01 | 2026-11-04 | 3e4bc82; stacked PR #2 | Current P1-01 evidence, CI 41759481411/41759551633 | All local/hosted gates pass; REVIEW for human security acceptance | No human review claimed |
 
 ## Historical P0-01 verification commands and results
 

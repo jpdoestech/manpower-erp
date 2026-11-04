@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import { AuthPanel } from "./AuthPanel";
 
 export function App() {
   const [status, setStatus] = useState("Connecting to API…");
@@ -44,6 +45,7 @@ export function App() {
           Local development bootstrap. Business modules are not available yet.
         </p>
       </section>
+      <AuthPanel />
       <footer>
         LOCAL WORKSPACE <span>01 / FOUNDATION</span>
       </footer>

@@ -54,7 +54,7 @@ def error_response(
             }
         },
         status_code=status,
-        headers=headers,
+        headers={**(headers or {}), "Cache-Control": "no-store"},
     )
 
 

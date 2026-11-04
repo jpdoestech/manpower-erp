@@ -14,14 +14,13 @@ from app.database import create_database_engine
 @pytest.mark.usefixtures("disposable_database")
 def test_clean_migrations_repeat_downgrade_and_preserve_data() -> None:
     config = Config(str(Path(__file__).parents[1] / "alembic.ini"))
-    assert ScriptDirectory.from_config(config).get_heads() == ["0001_infrastructure"]
+    assert ScriptDirectory.from_config(config).get_heads() == ["0002_identity"]
     engine = create_database_engine()
     try:
         assert inspect(engine).get_table_names() == []
-        command.upgrade(config, "head")
+        command.upgrade(config, "0001_infrastructure")
         assert inspect(engine).get_table_names() == ["alembic_version"]
-        command.upgrade(config, "head")
-        command.check(config)
+        command.upgrade(config, "0001_infrastructure")
         with engine.begin() as connection:
             assert (
                 MigrationContext.configure(connection).get_current_revision()
@@ -38,7 +37,7 @@ def test_clean_migrations_repeat_downgrade_and_preserve_data() -> None:
                 ).scalar_one()
                 == 42
             )
-        command.upgrade(config, "head")
+        command.upgrade(config, "0001_infrastructure")
         with engine.connect() as connection:
             assert (
                 MigrationContext.configure(connection).get_current_revision()
