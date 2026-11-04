@@ -13,6 +13,8 @@ from starlette.exceptions import HTTPException as StarletteHTTPException
 from starlette.responses import JSONResponse
 
 from app.database import create_database_engine, get_session
+from app.identity.routes import router as identity_router
+from app.identity.security import auth_settings
 from app.observability import (
     RequestDiagnostics,
     configure_logging,
@@ -43,6 +45,7 @@ class ErrorResponse(BaseModel):
 @asynccontextmanager
 async def lifespan(app: FastAPI) -> AsyncIterator[None]:
     configure_logging()
+    app.state.auth_settings = auth_settings()
     engine = create_database_engine()
     app.state.engine = engine
     logger.info("application_started")
@@ -61,13 +64,17 @@ def create_app() -> FastAPI:
         responses={422: {"model": ErrorResponse}, "default": {"model": ErrorResponse}},
     )
     api.add_middleware(RequestDiagnostics)
+    api.include_router(identity_router)
 
     @api.exception_handler(StarletteHTTPException)
     async def http_error(request: Request, exc: StarletteHTTPException) -> JSONResponse:
         codes = {
+            401: "unauthenticated",
+            403: "forbidden",
             404: "not_found",
             405: "method_not_allowed",
             503: "service_unavailable",
+            429: "rate_limited",
         }
         return error_response(
             request,

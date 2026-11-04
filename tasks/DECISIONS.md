@@ -10,6 +10,12 @@
 | ADR-006 | Immutable posted ledger, corrective entries | DESIGN ADOPTED; ROUNDING PENDING CPA | Accounting integrity | Finance owner |
 | ADR-009 | Explicit transactional Alembic migrations | ADOPTED | Reviewed linear revisions; no worker-startup DDL | Tech lead |
 | ADR-010 | Safe health, error and JSON diagnostic contracts | ADOPTED | Useful observability without payload/credential disclosure | Tech lead |
+| ADR-011 | Global identity, Argon2id passwords, opaque sessions and MFA plan | ADOPTED FOR P1-01; SECURITY REVIEW PENDING | Immediate revocation, no implied company grants | Security lead |
+
+P1-01 plan: [ADR-011](../docs/adr/ADR-011-authentication.md). Identity is separate
+from company membership and approval authority. MFA/recovery/blocklist/production
+policy remains pending security/stakeholder approval. P0-02 was reverified at exact
+head 4fd3914 before starting P1-01 on a stacked branch; PR #1 is not merged.
 
 ## P0-02 architecture records (2026-11-04)
 

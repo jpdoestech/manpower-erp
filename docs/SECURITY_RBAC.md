@@ -1,6 +1,6 @@
 # RBAC, Scope and Separation of Duties
 
-## P0-02 implemented access surface
+## P1-01 implemented access surface
 
 | Surface | Anonymous access | Company/role authority |
 |---|---|---|
@@ -8,12 +8,18 @@
 | GET /api/bootstrap | Public static product name and bootstrap stage | None |
 | GET /api/health/live | Public process status; no DB call | None |
 | GET /api/health/ready | Public 200/503 connectivity status; no DB details | None |
+| POST /api/auth/login | Credentials, bounded attempts, Origin check | Identity only; no company grants |
+| GET /api/auth/me | Valid active unexpired cookie session required | Own UUID/username/CSRF only |
+| POST /api/auth/logout | Valid session + CSRF + Origin check | Revoke own presented session |
+| POST /api/auth/password | Valid session + CSRF + current password + Origin check | Own password; revoke all own sessions |
+| Operator identity CLI | Server/database operator only; hidden password prompts | Create/reset/soft-disable identity; no role grants |
 | /docs, /redoc, /openapi.json | Public development API documentation | None |
 | Business routes | Not implemented; 404 | Client headers grant no access |
 
-No user, company-owned record, approval, export or background job exists yet.
-The API tests prove the current route boundary only; scoped RBAC and tenant
-isolation are not implemented or certified. Add their regression tests with P1.
+Global user/session/auth-event identities exist. No company membership, company-owned
+business record, approval, export or background job exists yet. Authentication grants
+no company, admin or financial permission. Scoped RBAC/tenant models remain P1-02/03;
+current boundary tests do not certify future tenant isolation. No signup/user-list API.
 Compose publishes only on loopback. P0-02 adds whitelisted JSON request diagnostics
 and UUID correlation; IDs and client headers grant no authority. Safe error responses
 omit validation input, exception messages and credentials. Shipped entrypoints turn
@@ -22,8 +28,16 @@ is server environment only; no arbitrary SQL/formula API exists. Alembic's versi
 table is infrastructure, not a company-owned business record.
 
 Dev Compose retains P0-01's DB owner credentials. Production migrator/runtime roles,
-RLS, auth and durable workflow audit need their scheduled security work; diagnostic
-logs do not implement these controls. Never put real employee or fiscal data in
+RLS and durable workflow audit need their scheduled security work; diagnostic
+logs and P1-01 authentication events do not implement financial audit controls.
+Passwords use Argon2id; only session-token hashes are stored. Sessions expire in eight
+hours and are revoked by logout/password reset/change/deactivation. Events contain
+subject UUID, kind/source, correlation and time; no credentials/login names. They are
+protected against UPDATE/DELETE/TRUNCATE by a PostgreSQL trigger, not tamper-proof
+against privileged DDL by the development DB owner.
+No MFA assurance is asserted. ADR-011 documents MFA/recovery/step-up planning and
+production prerequisites. Human security acceptance is required for P1-01.
+Never put real employee or fiscal data in
 this development scaffold. See ADR-002/005/009/010 and `OPERATIONS.md`.
 
 ## Access layers

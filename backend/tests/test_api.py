@@ -35,6 +35,10 @@ def test_openapi_declares_bootstrap_contract() -> None:
         "/api/bootstrap",
         "/api/health/live",
         "/api/health/ready",
+        "/api/auth/login",
+        "/api/auth/me",
+        "/api/auth/logout",
+        "/api/auth/password",
     }
     assert "Bootstrap" in schema["components"]["schemas"]
     for status in ("422", "503"):
