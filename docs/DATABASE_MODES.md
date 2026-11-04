@@ -76,7 +76,10 @@ Open http://127.0.0.1:5173. Check /api/health/live and /api/health/ready at port
 8000; sign in through the existing frontend. Ctrl+C stops each foreground process.
 The `.env.sqlite.example` is a reference, not an automatic loader. Don't overwrite
 an existing Docker `.env`. **Root setup.bat/run.bat still require Docker**; the
-nine Docker-free BAT commands are phase B, after A acceptance.
+full native BAT suite is phase B. The user subsequently authorized its setup/start
+slice: use **setup-local.bat** and **start-local.bat**; instructions in
+[LOCAL_WINDOWS_SETUP.md](LOCAL_WINDOWS_SETUP.md). This does not record formal A
+acceptance or complete the remaining B tools.
 
 From `backend`, `uv run --locked pytest -q -m "not integration"` needs no Docker
 or PostgreSQL. SQLite tests create/remove only their own temporary directories

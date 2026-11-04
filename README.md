@@ -11,13 +11,18 @@ see [account administration](docs/OPERATIONS.md#controlled-account-administratio
 Read [AGENTS.md](AGENTS.md), [the roadmap](tasks/ROADMAP.md),
 [status/evidence](tasks/STATUS.md) and [decisions](tasks/DECISIONS.md) before changes.
 
-## Fresh checkout with Docker
+## Windows without Docker
 
-CR-002A adds an opt-in **Docker-free SQLite** path with manual commands:
-[database modes and Windows setup](docs/DATABASE_MODES.md#manual-windows-native-setup-phase-a).
-Use Python 3.13.18 (patched SQLite WAL runtime). Existing root BAT files below
-still use Docker; native BAT tooling is CR-002B after A acceptance. Supabase Auth,
+Double-click **setup-local.bat** once, then **start-local.bat**. Setup installs
+managed Python 3.13.18 and locked dependencies, migrates SQLite and optionally
+creates your test account. Start waits for readiness and opens the app. Press
+Enter in the launcher window to stop. Requires Node 24/npm and uv 0.13.7.
+See [Windows SQLite setup](docs/LOCAL_WINDOWS_SETUP.md) for details and
+[manual commands](docs/DATABASE_MODES.md#manual-windows-native-setup-phase-a).
+Supabase Auth,
 cloud deployment and transfer are later phases, not implemented here.
+
+## Fresh checkout with Docker
 
 On Windows, use the root BAT files after installing/starting Docker Desktop in
 Linux-container mode:
