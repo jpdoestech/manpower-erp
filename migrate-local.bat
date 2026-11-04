@@ -9,7 +9,7 @@ if not exist "backend\.venv\Scripts\python.exe" (
     exit /b 1
 )
 set "PYTHONPATH="
-"backend\.venv\Scripts\python.exe" scripts\windows\local.py migrate 
+"backend\.venv\Scripts\python.exe" scripts\windows\local.py migrate
 set "ERP_LOCAL_RESULT=%ERRORLEVEL%"
 popd
 pause

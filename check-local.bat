@@ -9,7 +9,7 @@ if not exist "backend\.venv\Scripts\python.exe" (
     exit /b 1
 )
 set "PYTHONPATH="
-"backend\.venv\Scripts\python.exe" scripts\windows\local.py check 
+"backend\.venv\Scripts\python.exe" scripts\windows\local.py check
 set "ERP_LOCAL_RESULT=%ERRORLEVEL%"
 popd
 pause
