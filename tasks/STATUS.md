@@ -1,11 +1,47 @@
 # Project Status — Codex Must Maintain
 
 Last updated: 2026-11-04
-Current requested milestone: P1-02 (prerequisite audit/planning only)
-Current task status: BLOCKED at prerequisite; P1-01 remains REVIEW pending human security acceptance
+Current requested milestone: CR-002A database compatibility (only phase A authorized now)
+Current task status: IN_PROGRESS; local gates verified, hosted CI/review pending
 Repository inspected: YES; fetched main b3517d3, P0-02 4fd3914, P1-01 dc7fca3; clean before new branch
 Implemented code: existing P0/P1 foundations plus technical account administration/recovery follow-up; no company/finance modules
 Validated requirements: follow-up 5ca0ad3 has 6/6 hosted checks, 92 backend/13 frontend tests, migrations and Docker gates pass
+
+## CR-002A — SQLite / PostgreSQL compatibility
+
+Explicit user-requested architectural prerequisite; starts from verified PR #5
+head 19a0ba7, preserving all feature ancestry. Pre-code plan: CR-002.md, ADR-014.
+Fresh fetch and matching-head diagnostics: PRs #1–#4 6/6; #5 8/8 successful checks.
+Browser confirms #1–#3 open, #4 draft, #5 open; stacked bases unchanged, no merges.
+P1-01 #2/#3 remain PENDING HUMAN REVIEW; P1-02 remains blocked.
+
+Implemented opt-in local/test SQLite, explicit database/provider validation,
+safe .local path/WAL/FK/busy settings, UTC mapping and serialized transactions.
+Shared identity migrations retain PostgreSQL paths; 0004 adds SQLite-only strict
+length/Boolean/UUID guards, PostgreSQL no-op. Preserve immutable audit including
+REPLACE, existing independent account approval, recovery, sessions/CSRF and limits.
+Python 3.13.18 pin replaces old minor-only preference because local 3.13.12 bundled
+SQLite 3.50.4 with upstream WAL-reset risk; patched managed SQLite 3.53.1 verified.
+Application dependency locks unchanged. Native commands in DATABASE_MODES.md.
+
+Local final evidence: 101 non-integration tests, 42 actual PostgreSQL integration
+tests on disposable databases, 13 frontend tests, 8 existing BAT stub tests pass.
+Ruff format/lint, strict mypy (31 files), frontend format/lint/typecheck/build,
+pip-audit/npm audit (no known vulnerabilities), actionlint, Compose config and
+whitespace checks pass. Native Uvicorn/Vite HTTP smoke with SQLite passes health,
+readiness/bootstrap/page/login/me/CSRF logout. Detailed commands/limits: CR-002.md.
+Hosted CI has not yet been verified for the new implementation.
+
+Changed files: database/UTC type/identity models/service/security, Alembic env and
+0002/0003/0004, configuration/PG fixture/head tests plus SQLite acceptance tests,
+Python preference, CI, .gitignore/.env.sqlite.example, AGENTS/README,
+ARCHITECTURE/OPERATIONS/SECURITY_RBAC, DATABASE_MODES,
+SQLITE_POSTGRES_COMPATIBILITY, ADR-014 and task plan/roadmap/status/decisions.
+No business/UI module change. CR-002B/C/D/E NOT STARTED; root BATs still require
+Docker. Supabase TLS configuration is transport-only; live DB roles/poolers and
+Auth/Vercel/transfer are unverified/unimplemented phase gates. No production data
+or deployment. SQLite files are unencrypted; file owners can bypass DDL guards.
+Phase A review/acceptance is required before B; overall CR-002 is not DONE.
 
 ## Windows local launchers — separate authorized contributor task
 

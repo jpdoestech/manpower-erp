@@ -1,5 +1,12 @@
 # Decision Log (ADRs Index)
 
+CR-002A: [ADR-014](../docs/adr/ADR-014-local-sqlite.md) authorizes explicit local
+SQLite compatibility while retaining PostgreSQL production constraints/locking.
+No security/CPA/deployment approval is implied. A requires review before B;
+P1-01 human acceptance remains pending. Python 3.13.18 is pinned because the old
+local 3.13.12 bundled SQLite 3.50.4 affected by the upstream WAL-reset advisory;
+require a patched runtime, keep application dependency locks unchanged.
+
 Windows contributor tooling (user request, 2026-11-04): keep existing Compose
 runtimes and add setup.bat/run.bat instead of another native installer/service
 manager. Pin local default Docker context/file/project, generate a DB secret only

@@ -4,7 +4,6 @@ from uuid import UUID, uuid4
 from sqlalchemy import (
     Boolean,
     CheckConstraint,
-    DateTime,
     ForeignKey,
     Integer,
     String,
@@ -15,6 +14,7 @@ from sqlalchemy import (
 from sqlalchemy.orm import Mapped, mapped_column
 
 from app.database import Base
+from app.types import UTCDateTime
 
 
 class User(Base):
@@ -22,7 +22,13 @@ class User(Base):
     __table_args__ = (
         CheckConstraint(
             "username ~ '^[a-z][a-z0-9_.-]{2,63}$'", name="ck_auth_username"
-        ),
+        ).ddl_if(dialect="postgresql"),
+        CheckConstraint(
+            "length(username) BETWEEN 3 AND 64 AND username GLOB '[a-z]*' "
+            "AND username NOT GLOB '*[^a-z0-9_.-]*' "
+            "AND instr(username, char(0)) = 0",
+            name="ck_auth_username",
+        ).ddl_if(dialect="sqlite"),
     )
 
     id: Mapped[UUID] = mapped_column(primary_key=True, default=uuid4)
@@ -31,7 +37,7 @@ class User(Base):
     is_active: Mapped[bool] = mapped_column(Boolean, server_default=true())
     is_super_admin: Mapped[bool] = mapped_column(Boolean, server_default=false())
     created_at: Mapped[datetime] = mapped_column(
-        DateTime(timezone=True), server_default=func.now()
+        UTCDateTime(), server_default=func.now()
     )
 
 
@@ -41,10 +47,10 @@ class AuthSession(Base):
     token_hash: Mapped[str] = mapped_column(String(64), primary_key=True)
     user_id: Mapped[UUID] = mapped_column(ForeignKey("auth_users.id"), index=True)
     created_at: Mapped[datetime] = mapped_column(
-        DateTime(timezone=True), server_default=func.now()
+        UTCDateTime(), server_default=func.now()
     )
-    expires_at: Mapped[datetime] = mapped_column(DateTime(timezone=True))
-    revoked_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True))
+    expires_at: Mapped[datetime] = mapped_column(UTCDateTime())
+    revoked_at: Mapped[datetime | None] = mapped_column(UTCDateTime())
 
 
 class LoginLimit(Base):
@@ -52,7 +58,7 @@ class LoginLimit(Base):
     __table_args__ = (CheckConstraint("attempts > 0", name="ck_auth_attempts"),)
 
     key: Mapped[str] = mapped_column(String(80), primary_key=True)
-    window_started: Mapped[datetime] = mapped_column(DateTime(timezone=True))
+    window_started: Mapped[datetime] = mapped_column(UTCDateTime())
     attempts: Mapped[int] = mapped_column(Integer)
 
 
@@ -69,7 +75,7 @@ class AuthEvent(Base):
     source: Mapped[str] = mapped_column(String(16))
     request_id: Mapped[UUID] = mapped_column()
     created_at: Mapped[datetime] = mapped_column(
-        DateTime(timezone=True), server_default=func.now()
+        UTCDateTime(), server_default=func.now()
     )
 
 
@@ -96,11 +102,11 @@ class AccountChange(Base):
     requested_by: Mapped[UUID] = mapped_column(ForeignKey("auth_users.id"))
     action: Mapped[str] = mapped_column(String(24))
     created_at: Mapped[datetime] = mapped_column(
-        DateTime(timezone=True), server_default=func.now()
+        UTCDateTime(), server_default=func.now()
     )
-    expires_at: Mapped[datetime] = mapped_column(DateTime(timezone=True))
+    expires_at: Mapped[datetime] = mapped_column(UTCDateTime())
     approved_by: Mapped[UUID | None] = mapped_column(ForeignKey("auth_users.id"))
-    approved_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True))
+    approved_at: Mapped[datetime | None] = mapped_column(UTCDateTime())
 
 
 class PasswordReset(Base):
@@ -108,5 +114,5 @@ class PasswordReset(Base):
 
     token_hash: Mapped[str] = mapped_column(String(64), primary_key=True)
     user_id: Mapped[UUID] = mapped_column(ForeignKey("auth_users.id"), index=True)
-    expires_at: Mapped[datetime] = mapped_column(DateTime(timezone=True))
-    used_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True))
+    expires_at: Mapped[datetime] = mapped_column(UTCDateTime())
+    used_at: Mapped[datetime | None] = mapped_column(UTCDateTime())

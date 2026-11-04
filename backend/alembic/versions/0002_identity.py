@@ -11,6 +11,7 @@ depends_on: str | None = None
 
 
 def upgrade() -> None:
+    sqlite = op.get_bind().dialect.name == "sqlite"
     op.create_table(
         "auth_users",
         sa.Column("id", sa.Uuid(), primary_key=True),
@@ -24,7 +25,14 @@ def upgrade() -> None:
             server_default=sa.func.now(),
         ),
         sa.CheckConstraint(
-            "username ~ '^[a-z][a-z0-9_.-]{2,63}$'", name="ck_auth_username"
+            (
+                "length(username) BETWEEN 3 AND 64 AND username GLOB '[a-z]*' "
+                "AND username NOT GLOB '*[^a-z0-9_.-]*' "
+                "AND instr(username, char(0)) = 0"
+                if sqlite
+                else "username ~ '^[a-z][a-z0-9_.-]{2,63}$'"
+            ),
+            name="ck_auth_username",
         ),
     )
     op.create_table(
@@ -63,6 +71,15 @@ def upgrade() -> None:
         ),
     )
 
+    if sqlite:
+        for operation in ("UPDATE", "DELETE"):
+            op.execute(f"""
+                CREATE TRIGGER auth_events_immutable_{operation.lower()}
+                BEFORE {operation} ON auth_events FOR EACH ROW
+                BEGIN SELECT RAISE(ABORT, 'Authentication events are immutable'); END
+            """)
+        return
+
     op.execute("""
         CREATE FUNCTION auth_reject_event_mutation() RETURNS trigger
         LANGUAGE plpgsql AS $$
@@ -93,7 +110,8 @@ def downgrade() -> None:
                 "Identity downgrade requires empty tables; preserve user/audit history"
             )
     op.drop_table("auth_events")
-    op.execute("DROP FUNCTION auth_reject_event_mutation()")
+    if connection.dialect.name == "postgresql":
+        op.execute("DROP FUNCTION auth_reject_event_mutation()")
     op.drop_table("auth_login_limits")
     op.drop_index("ix_auth_sessions_user_id", table_name="auth_sessions")
     op.drop_table("auth_sessions")

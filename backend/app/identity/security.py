@@ -22,6 +22,8 @@ class AuthSettings:
 
 
 def auth_settings() -> AuthSettings:
+    if os.environ.get("AUTH_PROVIDER", "local") != "local":
+        raise RuntimeError("Authentication provider is not implemented; use local")
     origin = os.environ.get("AUTH_ORIGIN", "http://127.0.0.1:5173")
     secure = os.environ.get("AUTH_COOKIE_SECURE", "true")
     try:

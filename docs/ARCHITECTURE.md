@@ -10,6 +10,13 @@ React + TypeScript frontend, Python FastAPI backend, PostgreSQL, managed object 
 
 ## Modules
 
+CR-002A / ADR-014 adds opt-in local SQLite with shared ORM/Alembic history,
+UTC-aware timestamps and conservative serialized local identity transactions.
+PostgreSQL remains the production and concurrency authority. Configuration is
+explicit; staging/production SQLite is rejected. See DATABASE_MODES.md and
+SQLITE_POSTGRES_COMPATIBILITY.md. No company/financial schema is introduced.
+Supabase Auth adapters, cloud roles/poolers/Vercel and transfer are C/D/E work.
+
 P1-02 planning is recorded in `tasks/P1-02.md` and proposed ADR-013. It separates
 legal companies/client identities from dated branch engagements, contracts/sites,
 with company-preserving FKs and explicit bootstrap scope grants. No organization

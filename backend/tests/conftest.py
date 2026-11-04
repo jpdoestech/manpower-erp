@@ -13,6 +13,7 @@ from app.database import database_url
 def disposable_database(monkeypatch: pytest.MonkeyPatch) -> Iterator[None]:
     # Only generated test databases are created/dropped; never migrate the input DB.
     assert os.environ["DATABASE_URL"]
+    monkeypatch.setenv("DATABASE_MODE", "postgres")
     source = database_url().set(drivername="postgresql")
     name = f"p0_02_{uuid4().hex}"
     with psycopg.connect(

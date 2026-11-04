@@ -26,8 +26,11 @@ dependencies, so use README's native/CI test commands rather than container pyte
 
 Native API/Alembic requires an explicitly exported `DATABASE_URL`, using
 `postgresql://` or `postgresql+psycopg://` with username, host and database.
-Other drivers/SQLite and malformed/missing configuration fail with a generic
-startup error. URL-encode password characters when writing a native URL.
+Malformed/missing configuration fails with a generic startup error. CR-002A adds
+explicit local SQLite and TLS PostgreSQL transport modes; see
+[DATABASE_MODES.md](DATABASE_MODES.md) for native commands and restrictions.
+PostgreSQL remains the default; there is no fallback. URL-encode password
+characters when writing a native URL.
 The `.env` file is loaded by Compose, not automatically by the native API/CLI.
 
 Compose passes `POSTGRES_HOST=db`, `POSTGRES_USER`, `POSTGRES_PASSWORD` and
