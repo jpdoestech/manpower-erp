@@ -11,6 +11,15 @@
 | ADR-009 | Explicit transactional Alembic migrations | ADOPTED | Reviewed linear revisions; no worker-startup DDL | Tech lead |
 | ADR-010 | Safe health, error and JSON diagnostic contracts | ADOPTED | Useful observability without payload/credential disclosure | Tech lead |
 | ADR-011 | Global identity, Argon2id passwords, opaque sessions and MFA plan | ADOPTED FOR P1-01; SECURITY REVIEW PENDING | Immediate revocation, no implied company grants | Security lead |
+| ADR-012 | Technical administrators, independent account approval and single-use recovery | IMPLEMENTED FOR CR-001; VERIFICATION/SECURITY REVIEW PENDING | Add missing P1-01 controls without company RBAC | Security lead |
+
+CR-001: [ADR-012](../docs/adr/ADR-012-account-controls.md) changes ADR-011's
+CLI-only boundary under the user's expanded P1-01 request. Additive migration,
+false-by-default technical capability, protected two-admin bootstrap, independent
+account changes and 15-minute hash-only recovery. Manual verified token delivery,
+MFA enforcement, operator dual custody and production settings need security-owner
+acceptance. Full multi-company grants remain P1-02/P1-03. See the
+[follow-up plan/evidence](P1-01-account-controls.md); no CPA/production decision made.
 
 P1-01 plan: [ADR-011](../docs/adr/ADR-011-authentication.md). Identity is separate
 from company membership and approval authority. MFA/recovery/blocklist/production

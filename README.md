@@ -5,6 +5,8 @@ FastAPI API and PostgreSQL development database. P0-02 adds SQLAlchemy sessions,
 Alembic migration history, health checks and safe JSON diagnostics. Business modules and
 accounting/tax rules are not implemented yet. P1-01 adds operator-provisioned users,
 password sign-in and revocable cookie sessions; MFA is planned, not implemented.
+The P1-01 follow-up adds technical administrator approval and expiring recovery;
+see [account administration](docs/OPERATIONS.md#controlled-account-administration-p1-01).
 
 Read [AGENTS.md](AGENTS.md), [the roadmap](tasks/ROADMAP.md),
 [status/evidence](tasks/STATUS.md) and [decisions](tasks/DECISIONS.md) before changes.
@@ -100,9 +102,16 @@ explicitly exported local DATABASE_URL:
 uv run --locked python -m app.identity.cli create-user your.username
 uv run --locked python -m app.identity.cli reset-password your.username
 uv run --locked python -m app.identity.cli deactivate-user your.username
+uv run --locked python -m app.identity.cli bootstrap-admins first.admin second.admin
 ```
 
 For Compose: `docker compose exec api .venv/bin/python -m app.identity.cli create-user your.username`.
+
+`bootstrap-admins` is one-time provisioning of two distinct technical administrators,
+with each password entered and confirmed in hidden prompts. It grants no company
+access. Existing CLI commands are privileged operator recovery; routine account
+registration/activation/reset/deactivation uses independent administrator approval
+through the documented API. See OPERATIONS for verified private recovery delivery.
 Passwords are prompted twice with hidden input (15–128 characters). Never put a
 password in command arguments/history, source or logs. Usernames are normalized
 lowercase ASCII, 3–64 characters; begin with a letter, then letters/digits/._-.

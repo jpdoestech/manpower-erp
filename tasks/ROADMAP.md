@@ -26,6 +26,12 @@ Status values: TODO, IN_PROGRESS, BLOCKED, REVIEW, DONE. Each task gets a PR/cha
 | P8-01 | Hardening, backups, performance, UAT, deployment | all critical | Signed UAT, restore drill, security review |
 
 ## Task lifecycle
+
+P1-01's authorized CR-001 follow-up covers technical administrator provisioning,
+independent account control and expiring single-use password recovery; plan and
+security acceptance tests: `tasks/P1-01-account-controls.md`. It does not advance
+P1-02/P1-03 or grant company/financial authority. Human security acceptance still
+gates P1-01 completion; feature PRs remain separate and unmerged.
 TODO -> IN_PROGRESS (write task plan/tests) -> REVIEW (tests plus evidence) -> DONE (human acceptance for high-risk changes). BLOCKED includes reason and next action.
 
 ## Priority note

@@ -327,6 +327,8 @@ def test_current_head_and_safe_empty_downgrade(migrated: Config) -> None:
             "auth_sessions",
             "auth_login_limits",
             "auth_events",
+            "auth_account_changes",
+            "auth_password_resets",
         }
         command.upgrade(migrated, "head")
         command.check(migrated)

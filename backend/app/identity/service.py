@@ -1,14 +1,15 @@
 import secrets
 from dataclasses import dataclass
 from datetime import UTC, datetime, timedelta
+from typing import Literal
 from uuid import UUID, uuid4
 
 from fastapi import HTTPException
-from sqlalchemy import case, select, update
+from sqlalchemy import case, select, text, update
 from sqlalchemy.dialects.postgresql import insert
 from sqlalchemy.orm import Session
 
-from app.identity.models import AuthEvent, AuthSession, LoginLimit, User
+from app.identity.models import AuthEvent, AuthSession, LoginLimit, PasswordReset, User
 from app.identity.security import (
     SESSION_SECONDS,
     hash_password,
@@ -27,17 +28,44 @@ class Principal:
 
 
 def audit(
-    db: Session, kind: str, user_id: UUID | None, request_id: UUID, source: str = "api"
+    db: Session,
+    kind: str,
+    user_id: UUID | None,
+    request_id: UUID,
+    source: str = "api",
+    *,
+    actor_id: UUID | None = None,
+    change_id: UUID | None = None,
 ) -> None:
-    db.add(AuthEvent(kind=kind, user_id=user_id, request_id=request_id, source=source))
+    db.add(
+        AuthEvent(
+            kind=kind,
+            user_id=user_id,
+            request_id=request_id,
+            source=source,
+            actor_id=actor_id,
+            change_id=change_id,
+        )
+    )
 
 
-def consume_limit(db: Session, username: str, request_id: UUID) -> None:
+def account_lock(db: Session) -> None:
+    # Fixed transaction lock serializes bootstrap, administration and recovery.
+    db.execute(text("SELECT pg_advisory_xact_lock(810101)"))
+
+
+def consume_limit(
+    db: Session,
+    username: str,
+    request_id: UUID,
+    *,
+    bucket: Literal["name", "recovery"] = "name",
+) -> None:
     now = datetime.now(UTC)
     retry_after = 0
     for key, maximum, seconds in (
         ("global", 60, 60),
-        ("name:" + token_hash(username), 5, 900),
+        (bucket + ":" + token_hash(username), 5, 900),
     ):
         expired = LoginLimit.window_started <= now - timedelta(seconds=seconds)
         statement = insert(LoginLimit).values(key=key, attempts=1, window_started=now)
@@ -134,6 +162,7 @@ def change_password(
     username = principal.user.username
     token = principal.token
     consume_limit(db, username, request_id)
+    account_lock(db)
     user = db.scalar(
         select(User)
         .where(User.username == username)
@@ -157,6 +186,11 @@ def revoke_sessions(db: Session, user_id: UUID) -> None:
         .where(AuthSession.user_id == user_id, AuthSession.revoked_at.is_(None))
         .values(revoked_at=datetime.now(UTC))
     )
+    db.execute(
+        update(PasswordReset)
+        .where(PasswordReset.user_id == user_id, PasswordReset.used_at.is_(None))
+        .values(used_at=datetime.now(UTC))
+    )
 
 
 def provision_user(db: Session, username: str, password: str) -> User:
@@ -171,6 +205,7 @@ def provision_user(db: Session, username: str, password: str) -> User:
 
 
 def manage_user(db: Session, username: str, password: str | None = None) -> None:
+    account_lock(db)
     user = db.scalar(
         select(User)
         .where(User.username == normalize_username(username))

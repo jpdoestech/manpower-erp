@@ -92,7 +92,7 @@ For local account provisioning and native/Compose cookie configuration see READM
 P1-01 APIs: POST /api/auth/login, GET /api/auth/me, POST /api/auth/logout/password.
 Authentication events persist subject UUID, source/kind, request UUID and time;
 they are not the financial audit ledger. Retain UUIDs/history on deactivation.
-API sessions grant identity only; company membership and approval remain denied.
+API sessions grant no company membership or business approval authority.
 Cookie/origin/CSRF, throttle and MFA/production limits are specified in ADR-011.
 Operational retention/cleanup for expired sessions, throttle windows and auth events
 requires security/DPO policy; no blanket deletion command is provided.
@@ -150,3 +150,76 @@ curl --fail http://127.0.0.1:8000/api/health/ready
 On local failure, check exported variable names without printing their values,
 DB process/network reachability, migration job exit status and safe request ID.
 Never paste `.env`, raw `docker inspect` output or DB URLs into issue reports.
+
+## Controlled account administration (P1-01)
+
+Migrate before starting the new API. Revision 0003 expands identity tables only;
+old users remain active/inactive as before and gain no administrator capability.
+Old application readers can ignore the added columns/tables. Roll back code first
+if needed, retaining schema; downgrade refuses new security history/admin grants.
+Do not erase audit history or force downgrade. No production execution authorized.
+
+From `backend/` with an explicitly configured development database:
+
+```sh
+uv run --locked python -m app.identity.cli bootstrap-admins first.admin second.admin
+```
+
+Compose equivalent: `docker compose exec api .venv/bin/python -m app.identity.cli bootstrap-admins first.admin second.admin`.
+Use an interactive terminal (not `exec -T`); each operator enters and confirms their
+own passphrase without echo. No password arguments/env defaults. Both usernames
+must be distinct and unused. One transaction creates both technical admins or
+neither; bootstrap refuses if any admin exists, including a disabled one. Repeating
+it cannot elevate an existing user. The ordinary create-user CLI grants no admin
+capability. Database/server access is already privileged; protect it with operator
+access control, independent custody and monitored recovery before production.
+
+Initial API operator surface is the local OpenAPI documentation or a trusted
+same-origin API client. Admin A and Admin B must use separate browser profiles or
+cookie jars. Sign in through POST `/api/auth/login`; GET `/api/auth/me` supplies a
+session-bound CSRF value. Use `X-CSRF-Token`, the session cookie and matching
+browser Origin on every administrative mutation. Never put credentials in shell
+arguments, request URLs, tickets, screenshots, traces or browser localStorage.
+
+1. Admin A POSTs `/api/auth/admin/requests` with `username`, `action` and
+   `current_password`. Actions: register, activate, deactivate, reset_password,
+   unlock. Register creates an inactive non-admin identity and activation request;
+   no known initial password. The response supplies request and subject UUIDs.
+2. Admin B GETs `/api/auth/admin/requests?offset=0` (50 pending/unexpired records,
+   then offset=50, etc.; maximum offset 10000). Verify the canonical target username,
+   UUID, action and requester independently. POST
+   `/api/auth/admin/requests/{id}/approve` with `current_password` and own CSRF.
+   Requester and target cannot approve. Both admins must still be active/current
+   admins; requests expire in 24 hours. No API changes to technical admin capability.
+3. Activate/reset approval returns `reset_token` once; deactivate/unlock returns
+   null. Verify the account owner's identity through your approved private process
+   and hand the token directly to that owner. It is a credential: do not record it
+   in logs/tickets or send it through an unverified address. No email integration or
+   automated identity verification is implemented. Lost response/token requires a
+   new reset request and independent approval; approval replay cannot recover it.
+4. Owner opens the app's labelled recovery form and enters token/new passphrase,
+   or POSTs `/api/auth/reset-password` with `token` and `new_password`. Token expires
+   after 15 minutes, is consumed once, and cannot log in by itself. Only its hash is
+   stored. Sign in again after reset; no automatic session is created.
+
+Issuance revokes current sessions and older recovery tokens; redemption, password
+change/operator reset and deactivation invalidate remaining tokens/sessions.
+Activation of a disabled identity invalidates its old password and requires token
+recovery. Unlock clears only that login name's 5-attempt/15-minute window; it
+doesn't activate an account, change credentials or bypass global 60/minute limits.
+Administrative reauthentication uses the same name window; recovery uses a separate
+fixed 5/15-minute bucket. Retry-After is returned on 429. Normal timed lockout expires
+without administrator action. Preserve at least two active technical admins through
+the API; exceptional operator recovery has separate privileged custody.
+
+Audit events link actor, subject and change UUID to retained request/approval
+evidence without storing secrets. Development DB owners can still alter tables or
+triggers: production privilege separation/retention/monitoring remains required.
+These admins cannot access company data or approve financial documents. Memberships,
+scoped RBAC and financial Maker–Checker remain scheduled P1-02/P1-03. Password proof
+is not MFA; ADR-011's MFA plan and human security acceptance remain outstanding.
+
+The bootstrap pair is fixed for this slice; there is no API for adding/promoting
+technical admins. Total loss/disablement of both admins requires a separately
+reviewed operator recovery process before production. Do not use the ordinary
+operator deactivation CLI on that pair during normal development operation.

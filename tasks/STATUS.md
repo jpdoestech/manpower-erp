@@ -2,12 +2,36 @@
 
 Last updated: 2026-11-04
 Current milestone: P1-01
-Current task status: REVIEW (local/hosted checks pass; human security acceptance pending)
-Repository inspected: YES; all remotes fetched; main b3517d3 and P0-02 branch 4fd3914; P1-01 stacked on verified P0-02
-Implemented code: P0-01/P0-02 plus global password users, revocable sessions, auth audit, CLI and account UI; no company/finance modules
-Validated requirements: P0-02 reverified against code/36 tests/exact-head GitHub checks; P1-01 local and hosted authentication/migration/security/UI/Compose gates pass
+Current task status: REVIEW (expanded P1-01 local gates pass; hosted CI and human security review pending)
+Repository inspected: YES; fetched main b3517d3, P0-02 4fd3914, P1-01 dc7fca3; clean before new branch
+Implemented code: existing P0/P1 foundations plus technical account administration/recovery follow-up; no company/finance modules
+Validated requirements: baseline P1-01 dc7fca3 has 6/6 hosted checks; follow-up 92 backend/13 frontend tests and local quality gates pass
 
-## Current P1-01 outcome
+## Current P1-01 CR-001 follow-up
+
+Latest user request expands account controls. Actual source inspection confirms
+P0-01/P0-02 acceptance implementations and original P1-01 foundation; main still
+contains only P0-01. PRs #1/#2 remain open/unmerged. No duplicate bootstrap/infra.
+New branch feature/p1-01-account-controls from dc7fca3, stacked on #2. Pre-code
+plan/acceptance: tasks/P1-01-account-controls.md; CR-001/ADR-012 recorded before code.
+
+Additive migration 0003, technical admin bootstrap, independent account requests,
+single-use recovery and UI implemented. Final local gates: 92 tests in 55.76s;
+after reactivation-password hardening, 19 account-control cases pass in 30.63s.
+Frontend 13 tests, Ruff format/lint, strict mypy (26 files), Biome/tsc, build,
+lock check, pip/npm audits, Compose configuration, actionlint and diff check pass.
+Migration tests preserve 0002 user/session/audit rows and verify clean/repeat/drift/
+safe downgrade/re-upgrade plus history/grant refusal. Concurrent approval/recovery/
+bootstrap and server authorization tests pass. No dependency versions changed.
+
+Exact commands, initial failures/corrections, changed-file ledger and limitations:
+[P1-01-account-controls.md](P1-01-account-controls.md). Existing CI runs all new
+tests/current migrations; hosted source checks are still pending. Local Windows
+Docker execution unavailable. Human security acceptance remains required. Initial
+admin operator pair/manual private token delivery/MFA/production recovery and
+permissions require review. No company grants, P1-02, merge or production deployment.
+
+## Historical P1-01 foundation outcome (before CR-001)
 
 - User explicitly authorized verify-and-continue. Fetch confirmed two existing local/
   remote branches, five commits, clean worktree, open PR #1 and no open issues.
