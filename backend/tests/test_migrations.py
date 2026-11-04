@@ -14,7 +14,7 @@ from app.database import create_database_engine
 @pytest.mark.usefixtures("disposable_database")
 def test_clean_migrations_repeat_downgrade_and_preserve_data() -> None:
     config = Config(str(Path(__file__).parents[1] / "alembic.ini"))
-    assert ScriptDirectory.from_config(config).get_heads() == ["0002_identity"]
+    assert ScriptDirectory.from_config(config).get_heads() == ["0003_account_controls"]
     engine = create_database_engine()
     try:
         assert inspect(engine).get_table_names() == []

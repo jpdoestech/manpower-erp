@@ -2,6 +2,10 @@
 
 2026-11-04. Status: ADOPTED for local P1-01; human security acceptance pending.
 
+CR-001 follow-up: [ADR-012](ADR-012-account-controls.md) supersedes the CLI-only
+administration/reset-token exclusions below. Earlier implementation details are
+retained here as the original baseline; session/MFA decisions remain in effect.
+
 Options: external IdP, JWT bearer tokens, or server-managed opaque sessions.
 Choose local Argon2id passwords and DB-backed opaque cookie sessions for this slice;
 one first-party web app needs immediate revocation, not distributed bearer claims.

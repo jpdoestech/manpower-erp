@@ -1,4 +1,5 @@
 import { type FormEvent, useEffect, useState } from "react";
+import { RecoveryForm } from "./RecoveryForm";
 
 type Account = { id: string; username: string; csrf_token: string };
 
@@ -196,6 +197,7 @@ export function AuthPanel() {
           </button>
         </form>
       )}
+      {!account && <RecoveryForm />}
     </section>
   );
 }

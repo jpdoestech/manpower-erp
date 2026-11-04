@@ -2,6 +2,26 @@
 
 ## P1-01 implemented access surface
 
+CR-001 adds the narrow identity-administration surfaces below (ADR-012).
+Business/scoped RBAC and financial approval remain unimplemented.
+
+| Added surface | Required authority / control | Scope |
+|---|---|---|
+| CLI bootstrap-admins | Trusted server/DB operator, hidden prompts, distinct new accounts, one-time transactional guard | Two technical Super Admins; no company permissions |
+| GET /api/auth/admin/requests | Current active Super Admin session; bounded pages of 50 pending requests | Global identity metadata only |
+| POST /api/auth/admin/requests | Current active Super Admin, CSRF/Origin, current password, attempt limits | Request register/activate/deactivate/reset_password/unlock |
+| POST /api/auth/admin/requests/{id}/approve | Same controls, independent approver, active requester rechecked, unexpired/unapproved request | Approver differs from requester AND target; no financial authority |
+| POST /api/auth/reset-password | Possession of unexpired single-use random token, Origin validation, limits | Set target's password; revoke sessions/tokens, no automatic login |
+
+Existing users default to non-admin. API registration is inactive until independent
+approval; reset/activation approval returns one secret for verified private handoff.
+Only hashes persist. Name-based timed lockout is shared with reauthentication;
+approved unlock clears only that name's window. Recovery has a separate fixed
+bucket (5/15 minutes); global 60/minute protection remains. High traffic/edge DoS
+policy remains a production review item. Out-of-band DB operators already possess
+privileged access; protect CLI/database custody separately. No public signup,
+role-grant API, company memberships, MFA verification or company data access.
+
 | Surface | Anonymous access | Company/role authority |
 |---|---|---|
 | Web bootstrap page | Public local development page | None |
@@ -12,13 +32,14 @@
 | GET /api/auth/me | Valid active unexpired cookie session required | Own UUID/username/CSRF only |
 | POST /api/auth/logout | Valid session + CSRF + Origin check | Revoke own presented session |
 | POST /api/auth/password | Valid session + CSRF + current password + Origin check | Own password; revoke all own sessions |
-| Operator identity CLI | Server/database operator only; hidden password prompts | Create/reset/soft-disable identity; no role grants |
+| Operator identity CLI | Server/database operator only; hidden password prompts | Create/reset/soft-disable identity; one-time technical admin bootstrap, no company grants |
 | /docs, /redoc, /openapi.json | Public development API documentation | None |
 | Business routes | Not implemented; 404 | Client headers grant no access |
 
 Global user/session/auth-event identities exist. No company membership, company-owned
-business record, approval, export or background job exists yet. Authentication grants
-no company, admin or financial permission. Scoped RBAC/tenant models remain P1-02/03;
+business record, financial approval, export or background job exists yet. Login grants
+no company or financial permission. Explicit technical capability is required for
+identity administration. Scoped RBAC/tenant models remain P1-02/03;
 current boundary tests do not certify future tenant isolation. No signup/user-list API.
 Compose publishes only on loopback. P0-02 adds whitelisted JSON request diagnostics
 and UUID correlation; IDs and client headers grant no authority. Safe error responses

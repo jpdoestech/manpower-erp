@@ -1,6 +1,11 @@
 # Product Blueprint
 
 ## Scope and users
+
+P1-01 CR-001 adds global technical account administration, independent approval
+and manually delivered expiring recovery tokens (ADR-012). Technical Super Admin
+does not grant company/accounting access. Scoped multi-company memberships and
+financial approvals remain P1-02/P1-03; no production identity policy is approved.
 Web-first ERP for several independent Philippine legal companies. Each company can contain head offices, branches, clients, service contracts, deployments/sites and employees allocated to client projects. A client legal entity can be reused across several contracts, sites, branches where approved.
 
 ## Primary business capabilities

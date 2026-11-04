@@ -2,12 +2,46 @@
 
 Last updated: 2026-11-04
 Current milestone: P1-01
-Current task status: REVIEW (local/hosted checks pass; human security acceptance pending)
-Repository inspected: YES; all remotes fetched; main b3517d3 and P0-02 branch 4fd3914; P1-01 stacked on verified P0-02
-Implemented code: P0-01/P0-02 plus global password users, revocable sessions, auth audit, CLI and account UI; no company/finance modules
-Validated requirements: P0-02 reverified against code/36 tests/exact-head GitHub checks; P1-01 local and hosted authentication/migration/security/UI/Compose gates pass
+Current task status: REVIEW (expanded P1-01 local/hosted gates pass; human security acceptance pending)
+Repository inspected: YES; fetched main b3517d3, P0-02 4fd3914, P1-01 dc7fca3; clean before new branch
+Implemented code: existing P0/P1 foundations plus technical account administration/recovery follow-up; no company/finance modules
+Validated requirements: follow-up 5ca0ad3 has 6/6 hosted checks, 92 backend/13 frontend tests, migrations and Docker gates pass
 
-## Current P1-01 outcome
+## Current P1-01 CR-001 follow-up
+
+Latest user request expands account controls. Actual source inspection confirms
+P0-01/P0-02 acceptance implementations and original P1-01 foundation; main still
+contains only P0-01. PRs #1/#2 remain open/unmerged. No duplicate bootstrap/infra.
+New branch feature/p1-01-account-controls from dc7fca3, stacked on #2. Pre-code
+plan/acceptance: tasks/P1-01-account-controls.md; CR-001/ADR-012 recorded before code.
+
+Additive migration 0003, technical admin bootstrap, independent account requests,
+single-use recovery and UI implemented. Final local gates: 92 tests in 55.76s;
+after reactivation-password hardening, 19 account-control cases pass in 30.63s.
+Frontend 13 tests, Ruff format/lint, strict mypy (26 files), Biome/tsc, build,
+lock check, pip/npm audits, Compose configuration, actionlint and diff check pass.
+Migration tests preserve 0002 user/session/audit rows and verify clean/repeat/drift/
+safe downgrade/re-upgrade plus history/grant refusal. Concurrent approval/recovery/
+bootstrap and server authorization tests pass. No dependency versions changed.
+
+Exact commands, initial failures/corrections, changed-file ledger and limitations:
+[P1-01-account-controls.md](P1-01-account-controls.md). Implementation commit
+`5ca0ad3ab96e1e0fb3ea68f83ddc6302d5c061c3` in [PR #3](https://github.com/jpdoestech/manpower-erp/pull/3)
+passes all six exact-head GitHub checks: [push CI 41765130592](https://github.com/jpdoestech/manpower-erp/actions/runs/41765130592)
+and [PR CI 41765194928](https://github.com/jpdoestech/manpower-erp/actions/runs/41765194928).
+PR backend logs: 50 unit/API passed (1.66s), 42 PostgreSQL integration passed
+(13.79s). All source tests pass after final hardening. Migration CLI and Linux
+Docker boot/authentication/outage/recovery/persistence pass. Existing Node/runner
+annotations are non-failing maintenance notices. No lock/dependency changes.
+Local probe via psycopg verifies 0 input public tables and 0 generated DBs remaining;
+PostgreSQL stopped. Native psql unavailable; equivalent probe succeeded. Local
+Windows Docker execution unavailable. Human security acceptance remains required. Initial
+admin operator pair/manual private token delivery/MFA/production recovery and
+permissions require review. No company grants, P1-02, merge or production deployment.
+PR #3 stacks on #2; #1/#2 remain open. Next: review P1-01, then separately authorize
+P1-02 after acceptance. Documentation-only evidence follows the verified source.
+
+## Historical P1-01 foundation outcome (before CR-001)
 
 - User explicitly authorized verify-and-continue. Fetch confirmed two existing local/
   remote branches, five commits, clean worktree, open PR #1 and no open issues.
