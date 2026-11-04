@@ -11,6 +11,7 @@ depends_on: str | None = None
 
 
 def upgrade() -> None:
+    sqlite = op.get_bind().dialect.name == "sqlite"
     op.add_column(
         "auth_users",
         sa.Column(
@@ -58,13 +59,25 @@ def upgrade() -> None:
     op.create_index(
         "ix_auth_password_resets_user_id", "auth_password_resets", ["user_id"]
     )
-    op.add_column(
-        "auth_events", sa.Column("actor_id", sa.Uuid(), sa.ForeignKey("auth_users.id"))
-    )
-    op.add_column(
-        "auth_events",
-        sa.Column("change_id", sa.Uuid(), sa.ForeignKey("auth_account_changes.id")),
-    )
+    if sqlite:
+        # SQLite permits nullable inline REFERENCES without rebuilding audit history.
+        op.execute(
+            "ALTER TABLE auth_events ADD COLUMN actor_id CHAR(32) "
+            "REFERENCES auth_users(id)"
+        )
+        op.execute(
+            "ALTER TABLE auth_events ADD COLUMN change_id CHAR(32) "
+            "REFERENCES auth_account_changes(id)"
+        )
+    else:
+        op.add_column(
+            "auth_events",
+            sa.Column("actor_id", sa.Uuid(), sa.ForeignKey("auth_users.id")),
+        )
+        op.add_column(
+            "auth_events",
+            sa.Column("change_id", sa.Uuid(), sa.ForeignKey("auth_account_changes.id")),
+        )
 
 
 def downgrade() -> None:

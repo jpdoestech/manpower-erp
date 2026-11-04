@@ -18,6 +18,7 @@ from app.observability import logger
 def isolated_environment(monkeypatch: pytest.MonkeyPatch) -> Iterator[None]:
     for key in (
         "DATABASE_URL",
+        "DATABASE_MODE",
         "POSTGRES_USER",
         "POSTGRES_PASSWORD",
         "POSTGRES_HOST",

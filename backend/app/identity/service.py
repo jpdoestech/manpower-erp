@@ -6,7 +6,8 @@ from uuid import UUID, uuid4
 
 from fastapi import HTTPException
 from sqlalchemy import case, select, text, update
-from sqlalchemy.dialects.postgresql import insert
+from sqlalchemy.dialects.postgresql import insert as postgres_insert
+from sqlalchemy.dialects.sqlite import insert as sqlite_insert
 from sqlalchemy.orm import Session
 
 from app.identity.models import AuthEvent, AuthSession, LoginLimit, PasswordReset, User
@@ -51,7 +52,10 @@ def audit(
 
 def account_lock(db: Session) -> None:
     # Fixed transaction lock serializes bootstrap, administration and recovery.
-    db.execute(text("SELECT pg_advisory_xact_lock(810101)"))
+    connection = db.connection()
+    if connection.dialect.name == "postgresql":
+        db.execute(text("SELECT pg_advisory_xact_lock(810101)"))
+    # SQLite's connection begin hook already acquired BEGIN IMMEDIATE.
 
 
 def consume_limit(
@@ -68,6 +72,9 @@ def consume_limit(
         (bucket + ":" + token_hash(username), 5, 900),
     ):
         expired = LoginLimit.window_started <= now - timedelta(seconds=seconds)
+        insert = (
+            sqlite_insert if db.get_bind().dialect.name == "sqlite" else postgres_insert
+        )
         statement = insert(LoginLimit).values(key=key, attempts=1, window_started=now)
         count = db.scalar(
             statement.on_conflict_do_update(

@@ -13,6 +13,12 @@ Read [AGENTS.md](AGENTS.md), [the roadmap](tasks/ROADMAP.md),
 
 ## Fresh checkout with Docker
 
+CR-002A adds an opt-in **Docker-free SQLite** path with manual commands:
+[database modes and Windows setup](docs/DATABASE_MODES.md#manual-windows-native-setup-phase-a).
+Use Python 3.13.18 (patched SQLite WAL runtime). Existing root BAT files below
+still use Docker; native BAT tooling is CR-002B after A acceptance. Supabase Auth,
+cloud deployment and transfer are later phases, not implemented here.
+
 On Windows, use the root BAT files after installing/starting Docker Desktop in
 Linux-container mode:
 

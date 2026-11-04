@@ -2,6 +2,14 @@
 
 ## P1-01 implemented access surface
 
+CR-002A preserves this matrix on opt-in local SQLite: FK enforcement, immutable
+audit UPDATE/DELETE triggers, serialized account transactions, hash-only secrets,
+live capability/session rechecks, CSRF and independent approval remain required.
+SQLite is local/test only, with an unencrypted ignored file and patched WAL
+runtime; no company grants, MFA or human security acceptance are added. Unsupported
+AUTH_PROVIDER values fail until C; Supabase DB configuration is no Auth adapter.
+File/DDL owners can bypass guards; never store real employee/fiscal data locally.
+
 CR-001 adds the narrow identity-administration surfaces below (ADR-012).
 Business/scoped RBAC and financial approval remain unimplemented.
 

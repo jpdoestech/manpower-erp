@@ -9,8 +9,11 @@ target_metadata = Base.metadata
 
 def run_migrations() -> None:
     if context.is_offline_mode():
+        url = database_url()
+        if url.drivername == "sqlite":
+            raise RuntimeError("SQLite migrations require online data verification")
         context.configure(
-            url=database_url(),
+            url=url,
             target_metadata=target_metadata,
             literal_binds=True,
             dialect_opts={"paramstyle": "named"},
@@ -22,7 +25,11 @@ def run_migrations() -> None:
     engine = create_database_engine()
     try:
         with engine.connect() as connection:
-            context.configure(connection=connection, target_metadata=target_metadata)
+            context.configure(
+                connection=connection,
+                target_metadata=target_metadata,
+                transactional_ddl=True,
+            )
             with context.begin_transaction():
                 context.run_migrations()
     except SQLAlchemyError:
