@@ -7,6 +7,10 @@ keyboard and accessibility regressions. AuthPanel remains session/CSRF authority
 context/admin controls stay unavailable without backend scope/capability evidence.
 Phone/tablet/laptop/large-screen layouts share primitives, with touch targets and
 safe-area navigation. No business logic, role grant or pending acceptance bypass.
+Implementation 8c0f50c in [PR #10](https://github.com/jpdoestech/manpower-erp/pull/10)
+passes all 10 push/PR gates, including nine-profile browser/axe, real PostgreSQL,
+Compose and fresh Windows SQLite workflow. UI-001 is REVIEW, with no human
+acceptance inferred. Detailed evidence: UI-001.md.
 
 CR-002B completion (explicit request, 2026-11-04):
 [ADR-015](../docs/adr/ADR-015-local-recovery.md) uses held Windows locks and scoped
