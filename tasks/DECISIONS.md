@@ -1,5 +1,16 @@
 # Decision Log (ADRs Index)
 
+CR-002C preparation (2026-11-04): [ADR-017](../docs/adr/ADR-017-auth-providers.md)
+is PROPOSED ONLY, with [strategy](../docs/AUTH_PROVIDER_STRATEGY.md) and detailed
+[plan/gates](CR-002C.md). Recommend explicit adapters and an encrypted backend
+session bridge preserving local Argon2/cookies/CSRF; identity mapping by issuer/
+subject to ERP UUID, current ERP authorization and live provider-session checks.
+Token custody, key/revocation policy, external-only credentials, independent cloud
+administration/recovery and hosting topology remain unapproved decisions.
+No new runtime right, dependency or schema. #9/#10 matching-head CI is green;
+no submitted #2/#3/#9/#10 reviews or acceptance. See CR-002C-READINESS.md.
+Existing ADRs and human security gates remain in force; do not implement C yet.
+
 UI-001 (explicit request, 2026-11-04): [ADR-016](../docs/adr/ADR-016-ui.md)
 retains React/TypeScript/Vite and native HTML + shared CSS tokens after evaluating
 Tailwind/headless alternatives. Add dev-only Playwright/axe for real viewport,
