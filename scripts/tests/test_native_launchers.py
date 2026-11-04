@@ -173,6 +173,10 @@ class NativeBat(unittest.TestCase):
             for filename in (
                 "setup-local.bat",
                 "start-local.bat",
+                "setup.bat",
+                "run.bat",
+                ".env.example",
+                "compose.yaml",
                 "stop-local.bat",
                 "test-local.bat",
                 "backup-local-db.bat",
@@ -217,6 +221,7 @@ class NativeBat(unittest.TestCase):
                     timeout=300,
                 )
                 self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
+                print("Native BAT verified: setup-local.bat", flush=True)
                 if iteration == 0:
                     subprocess.run(
                         [
@@ -277,6 +282,10 @@ class NativeBat(unittest.TestCase):
                         self.fail("No readiness: " + (repo / "smoke.log").read_text())
                     with urlopen("http://127.0.0.1:5173/api/health/ready") as response:
                         self.assertEqual(response.read(), b'{"status":"ready"}')
+                    print(
+                        "Native BAT verified: start-local.bat and HTTP readiness",
+                        flush=True,
+                    )
                     with urlopen("http://127.0.0.1:5173/") as response:
                         self.assertIn(b"<title>Manpower ERP</title>", response.read())
                     cookies = HTTPCookieProcessor(http.cookiejar.CookieJar())
@@ -357,6 +366,7 @@ class NativeBat(unittest.TestCase):
                         self.assertEqual(
                             result.returncode, 0, result.stdout + result.stderr
                         )
+                        print(f"Native BAT verified: {name}", flush=True)
                         return result
 
                     bat("check-local.bat")

@@ -89,3 +89,17 @@ recovery tokens, expires pending requests and appends a local restore audit even
 The focused live-writer backup/restore/guard test passed (21.244s). No financial
 schema or posting requirements are claimed; those acceptance cases remain N/A.
 Hosted full nine-command fresh-Windows and PostgreSQL evidence remains pending.
+
+Actual test-local.bat rerun exits 0: 110 backend tests (61.67s), 29 launcher/
+safety tests passed with one opt-in full smoke skipped (30 discovered), and 13
+frontend tests (11.26s). Existing user servers remain untouched. Initial staged
+whitespace check caught wrapper trailing spaces; corrected in 166cdba. Initial
+push hit transient DNS failure, then succeeded without credential/config changes.
+
+First hosted run (166cdba) passes frontend, Compose and existing BAT gates but
+fails Linux mypy on Windows-only native API types. Explicit top-level platform
+implementations now pass strict mypy for both Windows and Linux (37 files), and
+Windows CI type-checks the helper as well. The full Windows flow reached its final
+test-local step; its nested legacy BAT tests failed because the disposable source
+copy omitted Docker fixture files. Copy those existing fixture inputs too; no
+Docker execution introduced. No failing check is accepted or suppressed.

@@ -2,7 +2,6 @@
 
 import ctypes
 import json
-import os
 import re
 import sys
 import time
@@ -12,9 +11,6 @@ from ctypes import wintypes
 from pathlib import Path
 from tempfile import gettempdir
 from uuid import uuid4
-
-if os.name == "nt":
-    import msvcrt
 
 
 class Busy(RuntimeError):
@@ -40,28 +36,6 @@ def local_file(root: Path, name: str) -> Path:
     if path.resolve() != path or (path.exists() and path.stat().st_nlink != 1):
         raise RuntimeError("Local tool files must not be links or redirected paths.")
     return path
-
-
-@contextmanager
-def lock(root: Path, name: str = "run.lock") -> Iterator[None]:
-    if os.name != "nt":
-        raise RuntimeError("Windows local launchers require Windows.")
-    with local_file(root, name).open("a+b") as stream:
-        if stream.tell() == 0:
-            stream.write(b"0")
-            stream.flush()
-        stream.seek(0)
-        try:
-            msvcrt.locking(stream.fileno(), msvcrt.LK_NBLCK, 1)
-        except OSError:
-            raise Busy(
-                "Another local ERP operation is active; stop it and retry."
-            ) from None
-        try:
-            yield
-        finally:
-            stream.seek(0)
-            msvcrt.locking(stream.fileno(), msvcrt.LK_UNLCK, 1)
 
 
 def running(root: Path) -> bool:
@@ -129,14 +103,45 @@ def request_stop(root: Path) -> None:
     )
 
 
-def enter_pressed() -> bool:
-    if sys.stdin.isatty():
-        return msvcrt.kbhit() and msvcrt.getwch() in {"\r", "\n"}
-    # Poll redirected input without a daemon thread holding stdin at shutdown.
-    available = wintypes.DWORD()
-    handle = wintypes.HANDLE(msvcrt.get_osfhandle(sys.stdin.fileno()))
-    if not ctypes.windll.kernel32.PeekNamedPipe(
-        handle, None, 0, None, ctypes.byref(available), None
-    ):
-        return True
-    return available.value > 0 and sys.stdin.read(1) in {"\r", "\n"}
+if sys.platform == "win32":
+    import msvcrt
+
+    @contextmanager
+    def lock(root: Path, name: str = "run.lock") -> Iterator[None]:
+        with local_file(root, name).open("a+b") as stream:
+            if stream.tell() == 0:
+                stream.write(b"0")
+                stream.flush()
+            stream.seek(0)
+            try:
+                msvcrt.locking(stream.fileno(), msvcrt.LK_NBLCK, 1)
+            except OSError:
+                raise Busy(
+                    "Another local ERP operation is active; stop it and retry."
+                ) from None
+            try:
+                yield
+            finally:
+                stream.seek(0)
+                msvcrt.locking(stream.fileno(), msvcrt.LK_UNLCK, 1)
+
+    def enter_pressed() -> bool:
+        if sys.stdin.isatty():
+            return msvcrt.kbhit() and msvcrt.getwch() in {"\r", "\n"}
+        # Poll redirected input without a daemon thread holding stdin at shutdown.
+        available = wintypes.DWORD()
+        handle = wintypes.HANDLE(msvcrt.get_osfhandle(sys.stdin.fileno()))
+        if not ctypes.windll.kernel32.PeekNamedPipe(
+            handle, None, 0, None, ctypes.byref(available), None
+        ):
+            return True
+        return available.value > 0 and sys.stdin.read(1) in {"\r", "\n"}
+
+else:
+
+    @contextmanager
+    def lock(root: Path, name: str = "run.lock") -> Iterator[None]:
+        raise RuntimeError("Windows local launchers require Windows.")
+
+    def enter_pressed() -> bool:
+        raise RuntimeError("Windows local launchers require Windows.")
