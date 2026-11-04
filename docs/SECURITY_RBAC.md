@@ -2,6 +2,13 @@
 
 ## P1-01 implemented access surface
 
+CR-002C planning adds no access surface. Proposed ADR-017/provider strategy keeps
+internal ERP UUID/current grants separate from external identity. Cloud links,
+reauthentication/refresh/recovery and company deny-all foundations require explicit
+review; JWT claims/email/technical admin confer no organizational authority. No
+Supabase authentication, cloud MFA, provider-session revocation or tenant model
+is implemented. P1-01 human security acceptance remains pending.
+
 UI-001 changes presentation only. Validated existing sessions render the shell;
 password/recovery/logout transport and server checks remain unchanged. No company
 contexts are fabricated; selector is unavailable pending scope APIs. System

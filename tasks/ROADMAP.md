@@ -43,6 +43,13 @@ gates B. See CR-002.md. This does not unblock P1-02 or rewrite prior acceptance.
 The subsequent explicit B-completion request authorizes all nine local tools;
 tracked in CR-002B-completion.md. CR-002C.md is plan-only until B acceptance.
 
+CR-002C's refreshed technical review includes CR-002C-READINESS.md, proposed
+ADR-017 and AUTH_PROVIDER_STRATEGY.md. Its G1–7 prerequisites/C-D decisions and
+C-A acceptance matrix preserve B acceptance and both P1-01 security reviews.
+Planning completion authorizes no provider implementation or automatic integration.
+Company permission foundations stay deny-all until approved P1-02/P1-03; live
+Vercel roles/poolers/deployment and self-host transfer remain D/E boundaries.
+
 P1-01's authorized CR-001 follow-up covers technical administrator provisioning,
 independent account control and expiring single-use password recovery; plan and
 security acceptance tests: `tasks/P1-01-account-controls.md`. It does not advance

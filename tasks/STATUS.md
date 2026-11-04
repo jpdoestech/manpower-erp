@@ -1,11 +1,43 @@
 # Project Status — Codex Must Maintain
 
 Last updated: 2026-11-04
-Current requested milestone: UI-001 independent responsive ERP design system
-Current task status: REVIEW; UI-001 implementation and automated gates verified
+Current requested milestone: CR-002C technical preparation and acceptance audit only
+Current task status: PLAN READY FOR REVIEW; provider implementation NOT STARTED, existing acceptance gates pending
 Repository inspected: YES; fetched main b3517d3, P0-02 4fd3914, P1-01 dc7fca3; clean before new branch
 Implemented code: existing P0/P1 foundations plus technical account administration/recovery follow-up; no company/finance modules
 Validated requirements: UI-001 8c0f50c has 10/10 hosted checks; 110 unit/SQLite, 42 PG, 27 frontend, 27 browser and 30 Windows safety tests pass
+
+## CR-002C — Technical plan only; prerequisites not accepted
+
+Planning branch docs/cr-002c-provider-plan starts at PR #10 e4608e1. Fresh fetch
+finds main b3517d3 and PRs #1–#10 still open/unmerged (#4 draft). #9 fbaa78c and
+#10 e4608e1 each have 10/10 passing checks, re-fetched at exact heads. Submitted
+reviews for #2/#3/#9/#10 are empty; P1-01 decisions stay PENDING HUMAN REVIEW,
+CR-002A/B and UI-001 remain REVIEW. No integration or human approval invented.
+
+Acceptance/source review: CR-002C-READINESS.md. Local fresh verification:
+110 backend unit/SQLite tests pass (33.91s), 27 frontend tests pass (16.50s),
+27 Chromium browser checks across nine 320–2560px profiles pass (1.3m). Reused
+exact-head CI confirms PG 42/migration CLI, Windows 30/all nine native commands,
+Compose recovery/persistence and audits/linters/types/build. No developer data or
+running local listeners changed. Physical-device/TTY/production limits remain.
+
+Expanded CR-002C.md with G1–7 prerequisites, C-D1–7 proposed decisions, eight
+implementation slices and C-A1–12 acceptance requirements. Added proposed
+ADR-017 and AUTH_PROVIDER_STRATEGY.md: preserve offline local cookie auth,
+server-owned Supabase bridge/JWT verification, approved identity mappings,
+encrypted refresh custody/live revocation, independent account operations,
+deny-all company foundation and Vercel/self-host compatibility boundaries.
+No runtime code, SDK/dependency, mapping migration, keys/project or provider tests.
+
+Blocking requirements: actual B/inherited acceptance and both P1-01 security
+reviews with conditions; approve custody/key/revocation/linking/admin MFA/recovery
+decisions; identify valid integration ancestry and a disposable authorized provider
+test project. UI review stays pending without inventing a new security gate.
+Next action is human technical/acceptance review of this plan, not automatic C
+implementation, PR merge, deployment or P1-02 work. Changed files: CR-002C.md,
+CR-002C-READINESS.md, AUTH_PROVIDER_STRATEGY.md, proposed ADR-017, ROADMAP,
+DECISIONS, STATUS, CR-002 phase index and architecture/security plan pointers.
 
 ## UI-001 — Independent responsive frontend foundation
 
