@@ -6,6 +6,9 @@ manufacturing formal A/P1-01 acceptance. Keep Docker launchers intact; add
 setup-local.bat/start-local.bat and one standard-library Python helper. Force
 local child configuration, retain .env/data, no default account/admin grants,
 wait for readiness, stop only owned live processes. Full B and C/D/E stay pending.
+Requested slice `d38a034` in [PR #7](https://github.com/jpdoestech/manpower-erp/pull/7)
+passes 10/10 branch/PR checks, including real native Windows BAT smoke. It is
+ready for review; no formal A/P1-01 acceptance or production assurance is inferred.
 
 CR-002A: [ADR-014](../docs/adr/ADR-014-local-sqlite.md) authorizes explicit local
 SQLite compatibility while retaining PostgreSQL production constraints/locking.

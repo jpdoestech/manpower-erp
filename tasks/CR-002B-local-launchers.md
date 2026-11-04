@@ -59,4 +59,18 @@ Not run locally in this slice: PostgreSQL integration/Docker boot, real hidden
 TTY password entry, normal browser opening or X-button termination. Existing
 application/migrations/dependencies are unchanged; hosted PostgreSQL/Docker gates
 must pass after push. Enter/Ctrl+C is the documented shutdown path. CI result and
-PR remain pending. Broader B is partial; formal A/P1-01 acceptance unchanged.
+PR are verified below. Broader B is partial; formal A/P1-01 acceptance unchanged.
+
+## Hosted verification
+
+Implementation `d38a034db6e233dd6653d8b357d8d2010cb908c1`,
+[PR #7](https://github.com/jpdoestech/manpower-erp/pull/7) stacked on #6, passes
+**10/10** matching-head checks:
+[push run 41797323446](https://github.com/jpdoestech/manpower-erp/actions/runs/41797323446),
+[PR run 41797507702](https://github.com/jpdoestech/manpower-erp/actions/runs/41797507702).
+Windows: 101 SQLite/unit tests in 14.18s, 9 native launcher tests in 42.257s with
+no skips, existing 8 BAT tests in the separate launcher job. Linux: 101 unit/
+SQLite tests in 9.43s, 42 actual PostgreSQL tests in 12.44s; migration CLI
+up/repeat/check/down/up/check, dependency audits and Docker auth/health/dependency
+recovery/persistence pass. Frontend gates also pass. Evidence docs follow verified
+implementation. Requested slice REVIEW; full B remains partial. No merge/deploy.

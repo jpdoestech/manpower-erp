@@ -2,7 +2,7 @@
 
 Last updated: 2026-11-04
 Current requested milestone: CR-002B explicitly requested local setup/start slice
-Current task status: IN_PROGRESS; setup/start implementation and tests underway
+Current task status: REVIEW; requested setup/start slice passes local/hosted gates
 Repository inspected: YES; fetched main b3517d3, P0-02 4fd3914, P1-01 dc7fca3; clean before new branch
 Implemented code: existing P0/P1 foundations plus technical account administration/recovery follow-up; no company/finance modules
 Validated requirements: follow-up 5ca0ad3 has 6/6 hosted checks, 92 backend/13 frontend tests, migrations and Docker gates pass
@@ -23,7 +23,14 @@ second-launch refusal and owned shutdown/port release; existing 8 Docker-stub
 tests pass. Ruff format/lint and strict mypy pass (33 files); 101 backend unit/
 SQLite tests and 13 frontend tests pass, frontend format/lint/types/build pass,
 actionlint and whitespace checks pass. CI now includes real native Windows smoke
-and lint/type coverage for the helper. Hosted checks pending after push.
+and lint/type coverage for the helper. Source `d38a034` passes 10/10 matching-head
+branch/PR checks in [PR #7](https://github.com/jpdoestech/manpower-erp/pull/7),
+stacked on #6. [Push 41797323446](https://github.com/jpdoestech/manpower-erp/actions/runs/41797323446),
+[PR 41797507702](https://github.com/jpdoestech/manpower-erp/actions/runs/41797507702).
+Hosted Windows: 101 SQLite/unit tests (14.18s), 9 native launcher tests (42.257s,
+no skips); separate job verifies 8 existing BAT tests. Linux: 101 unit/SQLite
+tests (9.43s), 42 PostgreSQL integration tests (12.44s), migration CLI, audits and
+Docker auth/health/persistence gates pass. Evidence-only docs follow this source.
 
 No backend/frontend application or migration change. Local PG/Docker execution,
 interactive hidden-password prompts, default browser opening and closing the
