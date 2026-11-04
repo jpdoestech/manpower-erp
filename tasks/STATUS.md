@@ -2,10 +2,10 @@
 
 Last updated: 2026-11-04
 Current milestone: P0-02
-Current task status: REVIEW (local checks pass; P0-02 hosted CI pending)
+Current task status: DONE (implementation and hosted CI verified; PR open for review)
 Repository inspected: YES; feature/p0-02-infrastructure from clean main b3517d3, matching origin
 Implemented code: P0-01 bootstrap plus P0-02 sessions/migrations/health/diagnostics; no business workflows or domain schema
-Validated requirements: P0-02 local tests, migration round trips, static checks, audits and Compose/CI syntax; hosted runtime gate pending
+Validated requirements: P0-02 local/hosted tests, migration round trips, static checks, audits, Docker clean boot/migration ordering, live/ready outage/recovery and volume persistence
 
 ## Latest outcome
 - P0-02 requested; clean main `b3517d3` matched origin and the reported scaffold.
@@ -17,13 +17,21 @@ Validated requirements: P0-02 local tests, migration round trips, static checks,
   safe downgrade/re-upgrade and unrelated-row preservation pass on disposable DBs.
 - Added request sessions/pool disposal, live/ready separation, safe consistent
   errors, UUID correlation and whitelisted JSON logs. Frontend behavior unchanged.
-- Local backend/frontend verification passed; task remains REVIEW until hosted CI
-  verifies migration service, Docker boot and DB outage/recovery/persistence.
+- Implementation commit `b8e3f9e1b0a5f6d5ee7a293602cffa4ed4c33806` pushed to
+  `feature/p0-02-infrastructure`; [PR #1](https://github.com/jpdoestech/manpower-erp/pull/1)
+  remains open for review into main. No merge performed.
+- Hosted [push CI 41752561626](https://github.com/jpdoestech/manpower-erp/actions/runs/41752561626)
+  and [PR CI 41752609488](https://github.com/jpdoestech/manpower-erp/actions/runs/41752609488)
+  both completed successfully on 2026-11-04. Backend, frontend and compose jobs all
+  passed in both runs, including migrations and outage/recovery/persistence.
+- P0-02 is DONE against its acceptance gates. Local isolated PostgreSQL cluster
+  stopped; generated test databases cleaned up; input database has zero public
+  tables. No production changes or P1-01 implementation performed.
 
 ## Next task / limits
 
-Finish P0-02 hosted checks and PR; do not merge automatically. Recommend **P1-01**
-only after P0-02 completion and a separate user request. No P1-01 work started.
+Review PR #1; do not merge automatically. Recommend **P1-01** only on a separate
+user request. No P1-01 work started.
 CPA rounding/tax/GL policies, stakeholder hierarchy/role/delegation decisions and
 production deployment/permissions remain unapproved; see ADRs. Runtime Compose
 credentials remain development-only. Local Windows Docker engine is unavailable.
@@ -55,6 +63,10 @@ generated disposable databases; the original input DB is not migrated.
 | `.\.tools\docker-compose.exe config --quiet` (root; process-local test password) | PASS; Compose 5.7.0 |
 | `.\.tools\actionlint\actionlint.exe .github/workflows/ci.yml` (root) | PASS; actionlint 1.7.12 |
 | `git diff --check` | PASS |
+| Hosted backend job 126320930700, push run 41752561626 | PASS; frozen install, format/lint/types, 32 unit/API tests, 4 PostgreSQL integration tests, migration CLI upgrade/repeat/check/downgrade/re-upgrade/check, audit |
+| Hosted frontend job 126320929113, push run 41752561626 | PASS; install, format/lint/types, 5 tests, build, audit |
+| Hosted compose job 126320929498, push run 41752561626 | PASS; clean build/boot, migration ordering, HTML/proxy/live/ready checks, DB stop → live 200/ready 503, DB restart/readiness recovery, migration check, persistent cluster identifier after container recreation; test volumes removed |
+| PR run 41752609488 (jobs 126321088423/126321088735/126321088836) | PASS; compose/backend/frontend on PR merge ref |
 
 Compared HEAD's uv.lock to the new lock using Python tomllib: **no previous package
 version changed**; only sqlalchemy, alembic, mako and markupsafe were added.
@@ -68,7 +80,8 @@ test typing; two log-capture tests initially bound a pytest phase stream, correc
 to a stable StringIO using the real configured JSON handler. Added Alembic's
 path_separator=os to remove deprecation warnings. No failed attempt counted as pass.
 
-Hosted CI/PR evidence: pending push and real run. No production migration/deploy.
+Hosted CI/PR evidence is linked above. Only documentation evidence changes follow
+the verified implementation commit. No production migration/deploy or auto-merge.
 Tenant/RBAC/Maker–Checker/financial tests are N/A without business records/workflows;
 architecture documentation does not certify implementation of those controls.
 
@@ -112,7 +125,7 @@ P0-01's next-task handoff was P0-02, which is the current authorized task above.
 | Task | Date | Change / commit | Checks executed | Result | Reviewer |
 |---|---|---|---|---|---|
 | P0-01 | 2026-11-04 | f0c60ea; pushed to main | Commands below, `tasks/P0-01.md`, CI run 41749669989 | PASS; all acceptance gates, including hosted Docker boot/persistence | Automated checks; no human review claimed |
-| P0-02 | 2026-11-04 | Feature branch; implementation delivery pending | P0-02 commands above | Local gates PASS; hosted CI pending | Automated local checks; no human review claimed |
+| P0-02 | 2026-11-04 | b8e3f9e; feature branch; PR #1 | P0-02 commands above; push/PR CI 41752561626/41752609488 | PASS; local and all hosted acceptance gates | Automated checks; PR review pending, no human review claimed |
 
 ## Historical P0-01 verification commands and results
 

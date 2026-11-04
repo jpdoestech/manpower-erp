@@ -35,6 +35,9 @@ tax configuration are reserved for their scheduled owner reviews.
 
 Only infrastructure decisions are implemented in P0-02. No stakeholder, CPA,
 security/UAT or production deployment approval is implied by these records.
+Infrastructure evidence: implementation `b8e3f9e`, [PR #1](https://github.com/jpdoestech/manpower-erp/pull/1),
+passing [push CI](https://github.com/jpdoestech/manpower-erp/actions/runs/41752561626)
+and [PR CI](https://github.com/jpdoestech/manpower-erp/actions/runs/41752609488).
 
 ## New decision format
 ID / Date / Context / Options / Decision / Tradeoffs / Consequences / Approver / Links to implementation and tests.
