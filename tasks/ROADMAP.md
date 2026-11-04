@@ -33,6 +33,8 @@ phase at a time: A database compatibility -> B Windows native tooling -> C real
 local/Supabase Auth -> D Supabase/Vercel deployment configuration -> E transfer
 and self-hosting. Each phase requires separate evidence/acceptance; A acceptance
 gates B. See CR-002.md. This does not unblock P1-02 or rewrite prior acceptance.
+The subsequent explicit B-completion request authorizes all nine local tools;
+tracked in CR-002B-completion.md. CR-002C.md is plan-only until B acceptance.
 
 P1-01's authorized CR-001 follow-up covers technical administrator provisioning,
 independent account control and expiring single-use password recovery; plan and

@@ -16,6 +16,8 @@ PostgreSQL remains the production and concurrency authority. Configuration is
 explicit; staging/production SQLite is rejected. See DATABASE_MODES.md and
 SQLITE_POSTGRES_COMPATIBILITY.md. No company/financial schema is introduced.
 Supabase Auth adapters, cloud roles/poolers/Vercel and transfer are C/D/E work.
+CR-002B local lifecycle/recovery follows ADR-015: Windows cooperative ownership,
+SQLite online snapshots and confirmed offline replacement; no production rollback.
 
 P1-02 planning is recorded in `tasks/P1-02.md` and proposed ADR-013. It separates
 legal companies/client identities from dated branch engagements, contracts/sites,

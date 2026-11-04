@@ -1,61 +1,107 @@
-# Windows local setup — SQLite, no Docker
+# Windows SQLite development tools
 
-From the repository root, double-click **setup-local.bat** once, then
-**start-local.bat** whenever you want to use the app. No PostgreSQL server or
-Docker is needed. The older setup.bat/run.bat still select the Docker workflow.
+No Docker or locally installed PostgreSQL is needed. Requires Windows, Node 24/npm,
+uv 0.13.7 and internet for initial locked downloads. Setup installs managed Python
+3.13.18 under ignored `.tools/python`; existing `.tools/Scripts/uv.exe` or uv on
+PATH is used. With an existing Python, install uv via `python -m pip install uv==0.13.7`.
+Reopen launchers after installing prerequisites. No administrator launch required.
 
-Prerequisites: Windows, Node.js 24 with npm, uv 0.13.7 and internet for the initial
-locked dependency downloads. No administrator launch is required. If uv is not
-already in `.tools/Scripts/uv.exe` or on PATH, install it using an existing Python:
+| Root command | Behavior |
+|---|---|
+| `setup-local.bat` | Locked dependencies/npm ci, SQLite upgrade/check, optional ordinary account; preserves .env/data |
+| `start-local.bat` | Loopback API/Vite, database readiness then browser; keep window open |
+| `stop-local.bat` | Cooperatively stop this checkout's managed instance; repeated stop is safe |
+| `test-local.bat` | Backend unit/SQLite, Windows helper/BAT tests, frontend tests; no PG/Docker |
+| `backup-local-db.bat` | Validated SQLite backup API snapshot, safe while app runs |
+| `restore-local-db.bat [backup-filename]` | Validate and restore trusted current-revision snapshot, offline and confirmed |
+| `reset-local-db.bat` | Empty migrated SQLite database, offline and confirmed, recovery backup first |
+| `migrate-local.bat` | Upgrade/repeat/schema check, offline; preserves data |
+| `check-local.bat` | Tool versions, integrity/FKs/guards/revision/schema and API readiness; stopped API is reported normally |
 
-```powershell
-python -m pip install uv==0.13.7
-```
+All commands locate the checkout regardless of invoking directory, force fixed
+local SQLite/auth child settings and return nonzero on failure. Existing parent
+environment and `.env` are preserved; cloud/PostgreSQL URLs are never selected by
+these tools. Existing `setup.bat` / `run.bat` remain the separate Docker workflow.
 
-Reopen the launcher after installing tools. Setup installs managed Python 3.13.18
-under the ignored `.tools/python` directory, synchronizes locked backend
-dependencies, runs npm ci, upgrades SQLite through Alembic and verifies schema
-drift. It asks whether to create an ordinary local test account. Choose Y, enter
-a username, then a hidden confirmed password of 15–128 characters. Choose N on
-repeat setups to retain accounts. No default credentials or administrator/company
-permissions are created; an existing username is never silently reset.
+## First run and ordinary account
 
-If account creation fails, the identity CLI now distinguishes password mismatch,
-length/username validation, unavailable hidden input and database errors. A
-15-character password is valid; type exactly the same password at confirmation.
-Run the BAT in a normal interactive terminal and do not pipe password input.
-An account named `admin` is still an ordinary user; names grant no privileges.
+Double-click setup-local.bat. Choose Y to create an ordinary test account, enter a
+username and hidden confirmed password of 15�128 characters. Choose N on later
+setups to retain accounts. No default credentials, automatic admin/company grants
+or silent username resets. A username such as admin grants no special privilege.
+The diagnostics distinguish mismatch, invalid input, missing interactive hidden
+input and database errors; never pipe a real password into a launcher.
+
+Double-click start-local.bat. Open http://127.0.0.1:5173 and sign in; API docs are
+at http://127.0.0.1:8000/docs. The current UI is the authentication foundation;
+organization/accounting dashboards are not implemented. Keep the launcher open.
+Press Enter/Ctrl+C there, or use stop-local.bat, to stop its owned servers.
+
+## Ownership and concurrency
+
+A held Windows lock plus random instance marker identifies a managed supervisor;
+no persisted PID authorizes killing. External stop requests only that marker. Child
+cleanup uses original live process handles. Unmanaged occupied ports cause refusal,
+never a process-name/port-wide taskkill. Old running launchers from before this
+protocol must be stopped with Enter in their own window before starting the new
+version. Closing a window forcibly/crashing the supervisor is not a recovery path:
+if listeners remain unmanaged, stop them through their original owning terminal.
+
+Setup/migrate/reset/restore require the app stopped and coordinate lifecycle/data
+locks. Backup can run live and captures committed WAL data with SQLite's backup
+API. Stop has a bounded wait; retry or use the owner window if startup is still busy.
+Logs are `.local/logs/api.log` and `web.log`, overwritten on start. Check errors
+without sharing credentials or database/backup contents.
+
+## Backup, restore and reset
+
+Active database: `.local/manpower_erp.db`. Backups: **`.local-backups`**, outside
+that active directory, with unique UTC timestamp/UUID filenames. Both directories
+and database sidecars are ignored by Git. Backups contain unencrypted account
+hashes/audit/history; keep them private on a local disk, outside network/cloud-sync
+folders. No automatic retention/deletion or production recovery guarantee.
 
 ```bat
-setup-local.bat
+backup-local-db.bat
+stop-local.bat
+restore-local-db.bat backup-YYYYMMDD-HHMMSS-UUID.sqlite3
+migrate-local.bat
+check-local.bat
 start-local.bat
 ```
 
-Start opens http://127.0.0.1:5173 only after the API database readiness check
-passes through the Vite proxy. Sign in with the account created during setup.
-Keep the launcher window open. Press **Enter or Ctrl+C in that window** to stop
-its API/web processes; data remains in `.local/manpower_erp.db`. Use this stop
-path before closing the terminal. API docs: http://127.0.0.1:8000/docs.
+Use the exact filename printed by backup. With no argument, restore lists recent
+backups and prompts for a filename. Directory paths, junctions/symlinks/hardlinks,
+corrupt files, missing guards/FKs and incompatible revisions are rejected. Trust
+only snapshots generated for this checkout; arbitrary external import is phase E.
 
-Both commands work when launched from another working directory. They select
-fixed local SQLite/auth settings in child processes and preserve existing `.env`
-and parent environment. Start refuses occupied 8000/5173 ports and does not kill
-their owner. Check `.local/logs/api.log` and `web.log` if startup fails; logs are
-overwritten on each start. Do not run setup while another local instance is open.
-No service installation, reset, deletion, backup/restore or persisted PID control.
+Restore requires **RESTORE LOCAL DATA**; reset requires **RESET LOCAL DATA**.
+Other input cancels with exit 2. Both operations preserve a validated pre-change
+snapshot before preparing/checking a candidate and atomically replacing the fixed
+local database. Failures preserve original data or the recovery snapshot. WAL is
+checkpointed/closed by SQLite; active sidecars are never manually discarded.
+All non-ERP SQLite clients must also be closed for offline file operations.
+Corrupt/incompatible active data that cannot be backed up safely is refused; no
+forced erase switch exists. Keep the recovery filename printed by the tool.
 
-For unattended verification, `setup-local.bat --no-account` skips provisioning;
-`start-local.bat --no-browser` suppresses browser opening but still waits for
-Enter to stop. These do not bypass authentication. To run the application tests:
+Restore preserves identity/history UUIDs, appends a local restore audit event,
+revokes restored sessions/password-reset tokens and expires pending account-change
+requests. Sign in again; request fresh recovery/approval actions as needed. Password
+hashes and existing account capabilities reflect the selected snapshot. The
+pre-change backup retains newer history. Reset creates no accounts or credentials.
 
-```powershell
-cd backend
-..\.tools\Scripts\uv.exe run --locked pytest -q -m "not integration"
-cd ..\frontend
-npm test
-```
+## Verification and boundaries
 
-Use synthetic data only. SQLite files are unencrypted. P1-01 human security review
-remains pending; organization/accounting modules are not available. This is the
-user-requested setup/start slice of CR-002B; the remaining stop/test/check/migrate/
-reset/backup/restore BAT tools have not been implemented. No Supabase/Vercel change.
+`test-local.bat` runs isolated SQLite tests and helper tests without touching the
+active development DB. The network/fresh-checkout smoke is deliberately disabled
+inside this command to avoid recursion and interfering with running local ports;
+Windows CI enables it once on a fresh runner, exercising all nine BATs. Security
+cases include account creation/confirmation/duplicates, login/logout, expiration,
+independent reset/activation/deactivation and CSRF. PostgreSQL concurrency requires
+its separate real CI database; SQLite does not establish financial concurrency.
+
+Formatting/lint/type/build/audit commands remain in README/CI and task evidence.
+Exit codes: 0 success (including already stopped/offline API check), 1 failure,
+2 cancelled reset/restore. No Supabase/Auth adapter or deployment change here.
+P1-01 human security acceptance remains pending. CR-002C has a technical plan only
+and requires CR-002B acceptance before implementation.

@@ -17,6 +17,9 @@ Double-click **setup-local.bat** once, then **start-local.bat**. Setup installs
 managed Python 3.13.18 and locked dependencies, migrates SQLite and optionally
 creates your test account. Start waits for readiness and opens the app. Press
 Enter in the launcher window to stop. Requires Node 24/npm and uv 0.13.7.
+The remaining tools are stop-local.bat, test-local.bat, backup-local-db.bat,
+restore-local-db.bat, reset-local-db.bat, migrate-local.bat and check-local.bat.
+Restore/reset require typed confirmation and an automatic recovery backup.
 See [Windows SQLite setup](docs/LOCAL_WINDOWS_SETUP.md) for details and
 [manual commands](docs/DATABASE_MODES.md#manual-windows-native-setup-phase-a).
 Supabase Auth,

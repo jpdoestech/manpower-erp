@@ -1,5 +1,14 @@
 # Decision Log (ADRs Index)
 
+CR-002B completion (explicit request, 2026-11-04):
+[ADR-015](../docs/adr/ADR-015-local-recovery.md) uses held Windows locks and scoped
+cooperative stop instead of PID-file authority; SQLite backup API and validated,
+confirmed offline candidate replacement with pre-change recovery snapshots.
+Restore revokes ephemeral authentication capabilities and records a local audit
+event while retaining historical UUIDs. No PostgreSQL/auth policy weakening or
+production recovery assertion. C is planned only in CR-002C.md; its implementation
+requires B acceptance. Pending P1-01 human reviews are unchanged.
+
 2026-11-04 subsequent user request explicitly authorizes Docker-free setup/start
 BATs now. Implement only that B slice, stacked on verified A (65246ba), without
 manufacturing formal A/P1-01 acceptance. Keep Docker launchers intact; add

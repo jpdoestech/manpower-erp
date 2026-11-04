@@ -1,13 +1,22 @@
 # Project Status — Codex Must Maintain
 
 Last updated: 2026-11-04
-Current requested milestone: Local account provisioning diagnostic follow-up
-Current task status: REVIEW; diagnostic fix passes local tests and hosted gates
+Current requested milestone: CR-002B completion, CR-002C technical plan only
+Current task status: IN_PROGRESS; remaining tools implemented, verification underway
 Repository inspected: YES; fetched main b3517d3, P0-02 4fd3914, P1-01 dc7fca3; clean before new branch
 Implemented code: existing P0/P1 foundations plus technical account administration/recovery follow-up; no company/finance modules
 Validated requirements: follow-up 5ca0ad3 has 6/6 hosted checks, 92 backend/13 frontend tests, migrations and Docker gates pass
 
 ## CR-002B — Requested setup/start slice
+
+Completion follow-up: feature/cr-002b-completion starts at verified 9e44c96 (#8).
+Fresh fetch/connector audit: #6/#7/#8 open/unmerged, no reviews, each 10/10 checks.
+Pre-code plan and evidence: CR-002B-completion.md; ADR-015 local recovery design.
+Added seven missing BATs, Windows lock/cooperative stop and SQLite snapshot/
+confirmed replacement helpers. Preserved latest CLI diagnostics and all app/PG
+behavior. Existing user API/web remain running and untouched; fixed-port real
+local smoke is skipped, actual nine-tool smoke is required on Windows CI.
+CR-002C.md is a technical plan only. P1-01 human acceptance remains pending.
 
 Local provisioning follow-up: user reported a generic failure after password
 confirmation. Supplied password satisfies length policy; read-only local check
