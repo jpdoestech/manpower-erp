@@ -2,12 +2,42 @@
 
 | ID | Decision | Status | Rationale | Owner |
 |---|---|---|---|---|
-| ADR-001 | React/TypeScript, FastAPI, PostgreSQL modular monolith | ADOPTED FOR LOCAL BOOTSTRAP | Follow recommended stack; production deployment remains undecided | Tech lead |
-| ADR-002 | Strict legal-company data isolation | REQUIRED | Cross-tenant disclosure is unacceptable | Security lead |
-| ADR-003 | Versioned relational billing metadata rather than DDL-per-client | REQUIRED | Historical fidelity and safe extensions | Architect |
+| ADR-001 | React/TypeScript, FastAPI, PostgreSQL modular monolith | ADOPTED FOR INFRASTRUCTURE | Follow existing stack; production deployment remains undecided | Tech lead |
+| ADR-002 | Strict legal-company data isolation | DESIGN ADOPTED; IMPLEMENTATION P1 | Cross-tenant disclosure is unacceptable | Security lead |
+| ADR-003 | Versioned relational billing metadata rather than DDL-per-client | DESIGN ADOPTED; IMPLEMENTATION P3 | Historical fidelity and safe extensions | Architect |
 | ADR-004 | Safe typed DSL, no arbitrary code evaluation | REQUIRED | Prevent computation and code injection | Architect |
-| ADR-005 | Scoped Maker–Checker, no self-approval | REQUIRED | Financial control | Finance owner |
-| ADR-006 | Immutable posted ledger, corrective entries | REQUIRED | Accounting integrity | Finance owner |
+| ADR-005 | Scoped Maker–Checker, no self-approval | DESIGN ADOPTED; IMPLEMENTATION P1 | Financial control | Finance owner |
+| ADR-006 | Immutable posted ledger, corrective entries | DESIGN ADOPTED; ROUNDING PENDING CPA | Accounting integrity | Finance owner |
+| ADR-009 | Explicit transactional Alembic migrations | ADOPTED | Reviewed linear revisions; no worker-startup DDL | Tech lead |
+| ADR-010 | Safe health, error and JSON diagnostic contracts | ADOPTED | Useful observability without payload/credential disclosure | Tech lead |
+
+## P0-02 architecture records (2026-11-04)
+
+Detailed decisions, alternatives, tradeoffs and approval boundaries were written
+before implementation. Existing IDs remain stable; ADR-007 numbering and ADR-008
+tax configuration are reserved for their scheduled owner reviews.
+
+- [ADR-001](../docs/adr/ADR-001-stack.md): modular monolith, PostgreSQL,
+  SQLAlchemy 2.x and request-owned sessions. Existing runtime versions retained.
+- [ADR-002](../docs/adr/ADR-002-company-isolation.md): shared-schema company scope,
+  same-company foreign keys and planned RLS; organization/client hierarchy needs
+  stakeholder confirmation before P1-02 schema. No tenant schema implemented here.
+- [ADR-003](../docs/adr/ADR-003-billing-versions.md): typed, effective-dated immutable
+  billing versions/snapshots; finance approval of applicability still required.
+- [ADR-005](../docs/adr/ADR-005-maker-checker.md): deny by default, scoped current
+  grants, self-approval prevention; role/delegation/MFA policy approval pending.
+- [ADR-006](../docs/adr/ADR-006-financial-integrity.md): immutable posted finance,
+  Decimal/NUMERIC; rounding precision/mode/stages remain BLOCKED for CPA approval.
+- [ADR-009](../docs/adr/ADR-009-migrations.md): explicit Alembic job, no-op baseline,
+  disposable upgrade/downgrade/drift tests and separate production runtime/migrator.
+- [ADR-010](../docs/adr/ADR-010-api-diagnostics.md): live/ready, UUID correlation,
+  safe error envelopes and whitelisted JSON logs; log-derived metrics design.
+
+Only infrastructure decisions are implemented in P0-02. No stakeholder, CPA,
+security/UAT or production deployment approval is implied by these records.
+Infrastructure evidence: implementation `b8e3f9e`, [PR #1](https://github.com/jpdoestech/manpower-erp/pull/1),
+passing [push CI](https://github.com/jpdoestech/manpower-erp/actions/runs/41752561626)
+and [PR CI](https://github.com/jpdoestech/manpower-erp/actions/runs/41752609488).
 
 ## New decision format
 ID / Date / Context / Options / Decision / Tradeoffs / Consequences / Approver / Links to implementation and tests.

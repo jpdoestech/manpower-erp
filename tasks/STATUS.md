@@ -1,13 +1,106 @@
 # Project Status — Codex Must Maintain
 
 Last updated: 2026-11-04
-Current milestone: P0-01
-Current task status: DONE (local checks and hosted CI acceptance gates passed)
-Repository inspected: YES; initial commit 99cd935, origin https://github.com/jpdoestech/manpower-erp.git
-Implemented code: P0-01 local bootstrap only; no business workflows or domain schema
-Validated requirements: Local frozen installs, static checks, API/UI tests, PostgreSQL integration, HTTP/browser smoke, Compose configuration, hosted CI and Docker boot/persistence
+Current milestone: P0-02
+Current task status: DONE (implementation and hosted CI verified; PR open for review)
+Repository inspected: YES; feature/p0-02-infrastructure from clean main b3517d3, matching origin
+Implemented code: P0-01 bootstrap plus P0-02 sessions/migrations/health/diagnostics; no business workflows or domain schema
+Validated requirements: P0-02 local/hosted tests, migration round trips, static checks, audits, Docker clean boot/migration ordering, live/ready outage/recovery and volume persistence
 
 ## Latest outcome
+- P0-02 requested; clean main `b3517d3` matched origin and the reported scaffold.
+  Created `feature/p0-02-infrastructure`; plan/tests are in `tasks/P0-02.md`.
+  Reviewed all mandatory docs, source, lockfiles, Compose and CI; detailed ADRs
+  recorded before implementing infrastructure. P0-01 evidence below is historical.
+- Added SQLAlchemy 2.1.7/Alembic 1.20.1; all existing locked versions retained.
+  The baseline creates only Alembic history; clean/repeated upgrade, drift check,
+  safe downgrade/re-upgrade and unrelated-row preservation pass on disposable DBs.
+- Added request sessions/pool disposal, live/ready separation, safe consistent
+  errors, UUID correlation and whitelisted JSON logs. Frontend behavior unchanged.
+- Implementation commit `b8e3f9e1b0a5f6d5ee7a293602cffa4ed4c33806` pushed to
+  `feature/p0-02-infrastructure`; [PR #1](https://github.com/jpdoestech/manpower-erp/pull/1)
+  remains open for review into main. No merge performed.
+- Hosted [push CI 41752561626](https://github.com/jpdoestech/manpower-erp/actions/runs/41752561626)
+  and [PR CI 41752609488](https://github.com/jpdoestech/manpower-erp/actions/runs/41752609488)
+  both completed successfully on 2026-11-04. Backend, frontend and compose jobs all
+  passed in both runs, including migrations and outage/recovery/persistence.
+- P0-02 is DONE against its acceptance gates. Local isolated PostgreSQL cluster
+  stopped; generated test databases cleaned up; input database has zero public
+  tables. No production changes or P1-01 implementation performed.
+
+## Next task / limits
+
+Review PR #1; do not merge automatically. Recommend **P1-01** only on a separate
+user request. No P1-01 work started.
+CPA rounding/tax/GL policies, stakeholder hierarchy/role/delegation decisions and
+production deployment/permissions remain unapproved; see ADRs. Runtime Compose
+credentials remain development-only. Local Windows Docker engine is unavailable.
+
+## P0-02 exact verification (2026-11-04)
+
+Backend commands executed from `backend/` using `..\.tools\Scripts\uv` (uv 0.13.7,
+Python 3.13.12). DATABASE_URL explicitly targeted isolated loopback PostgreSQL 18.3
+on port 55432, ignored `.local/p0-02-postgres-data`. New tests create/drop only
+generated disposable databases; the original input DB is not migrated.
+
+| Command | Final local result |
+|---|---|
+| `..\.tools\Scripts\uv sync --locked` | PASS; 63 resolved, 61 checked on Windows |
+| `..\.tools\Scripts\uv lock --check` | PASS; manifest/lock agree |
+| `..\.tools\Scripts\uv run --locked ruff format --check .` | PASS; 13 files |
+| `..\.tools\Scripts\uv run --locked ruff check .` | PASS after formatting/import cleanup |
+| `..\.tools\Scripts\uv run --locked mypy app tests alembic` | PASS; 13 source files |
+| `..\.tools\Scripts\uv run --locked pytest -q` | PASS; 36 tests, no warnings; original P0-01 tests preserved |
+| `..\.tools\Scripts\uv run --locked pip-audit` | PASS; no known vulnerabilities |
+| `..\.tools\Scripts\uv run --locked alembic upgrade head` (twice), `alembic check`, `alembic current`, `alembic downgrade base`, `alembic upgrade head`, `alembic check` (all prefixed `..\.tools\Scripts\uv run --locked`) | PASS on newly generated disposable CLI DB; head 0001_infrastructure; no upgrade operations detected; DB dropped after checks |
+| `npm ci` (frontend) | PASS; 108 added, 109 audited |
+| `npm run format:check` (frontend) | PASS; 9 files |
+| `npm run lint` (frontend) | PASS; 9 files |
+| `npm run typecheck` (frontend) | PASS; tsc exits 0 |
+| `npm test` (frontend) | PASS; 5 tests |
+| `npm run build` (frontend) | PASS; tsc/Vite 8.3.5, 16 modules |
+| `npm audit --audit-level=low` (frontend) | PASS; 0 vulnerabilities |
+| `.\.tools\docker-compose.exe config --quiet` (root; process-local test password) | PASS; Compose 5.7.0 |
+| `.\.tools\actionlint\actionlint.exe .github/workflows/ci.yml` (root) | PASS; actionlint 1.7.12 |
+| `git diff --check` | PASS |
+| Hosted backend job 126320930700, push run 41752561626 | PASS; frozen install, format/lint/types, 32 unit/API tests, 4 PostgreSQL integration tests, migration CLI upgrade/repeat/check/downgrade/re-upgrade/check, audit |
+| Hosted frontend job 126320929113, push run 41752561626 | PASS; install, format/lint/types, 5 tests, build, audit |
+| Hosted compose job 126320929498, push run 41752561626 | PASS; clean build/boot, migration ordering, HTML/proxy/live/ready checks, DB stop → live 200/ready 503, DB restart/readiness recovery, migration check, persistent cluster identifier after container recreation; test volumes removed |
+| PR run 41752609488 (jobs 126321088423/126321088735/126321088836) | PASS; compose/backend/frontend on PR merge ref |
+
+Compared HEAD's uv.lock to the new lock using Python tomllib: **no previous package
+version changed**; only sqlalchemy, alembic, mako and markupsafe were added.
+Offline SQL generation is tested without connecting or disclosing credentials.
+Migration tests prove only alembic_version exists after clean initialization,
+single head/idempotence, downgrade safety and preservation of an unrelated row.
+Session tests prove rollback-on-close/exception and explicit-commit persistence.
+
+Initial issues resolved before delivery: Ruff formatting/import order and strict
+test typing; two log-capture tests initially bound a pytest phase stream, corrected
+to a stable StringIO using the real configured JSON handler. Added Alembic's
+path_separator=os to remove deprecation warnings. No failed attempt counted as pass.
+
+Hosted CI/PR evidence is linked above. Only documentation evidence changes follow
+the verified implementation commit. No production migration/deploy or auto-merge.
+Tenant/RBAC/Maker–Checker/financial tests are N/A without business records/workflows;
+architecture documentation does not certify implementation of those controls.
+
+## P0-02 changed files
+
+- Runtime/config: `.env.example`, `backend/app/main.py`, `backend/app/database.py`,
+  `backend/app/observability.py`, `backend/pyproject.toml`, `backend/uv.lock`,
+  `backend/Dockerfile`, `compose.yaml`, `.github/workflows/ci.yml`.
+- Migrations: `backend/alembic.ini`, `backend/alembic/env.py`,
+  `backend/alembic/script.py.mako`, `backend/alembic/versions/0001_infrastructure_baseline.py`.
+- Tests: `backend/tests/conftest.py`, `backend/tests/test_api.py`,
+  `backend/tests/test_configuration.py`, `backend/tests/test_diagnostics.py`,
+  `backend/tests/test_migrations.py`, `backend/tests/test_sessions.py`.
+- Docs: `README.md`, `docs/ARCHITECTURE.md`, `docs/SECURITY_RBAC.md`,
+  `docs/OPERATIONS.md`, seven ADRs (001/002/003/005/006/009/010) under `docs/adr/`,
+  `tasks/P0-02.md`, `tasks/STATUS.md`, `tasks/DECISIONS.md`.
+
+## Historical P0-01 outcome
+
 - Read all mandatory documents and wrote `tasks/P0-01.md` before coding.
 - Original starter-pack report matched the code. The folder initially lacked Git;
   after the user initialized it, inspection found a clean governance-only commit.
@@ -26,17 +119,15 @@ Validated requirements: Local frozen installs, static checks, API/UI tests, Post
   are now verified on the Linux runner. P0-01 is DONE; no P0-02 work started.
 - No production deployment or production data changes were performed.
 
-## Next Codex actions
-1. P0-02 is next and was not started here. Wait for a request to begin it.
-2. Local container execution still needs Docker Desktop/engine; the same Compose
-   gates have passed on hosted CI. Standing user authorization covers commit/push.
+P0-01's next-task handoff was P0-02, which is the current authorized task above.
 
 ## Task evidence log
 | Task | Date | Change / commit | Checks executed | Result | Reviewer |
 |---|---|---|---|---|---|
 | P0-01 | 2026-11-04 | f0c60ea; pushed to main | Commands below, `tasks/P0-01.md`, CI run 41749669989 | PASS; all acceptance gates, including hosted Docker boot/persistence | Automated checks; no human review claimed |
+| P0-02 | 2026-11-04 | b8e3f9e; feature branch; PR #1 | P0-02 commands above; push/PR CI 41752561626/41752609488 | PASS; local and all hosted acceptance gates | Automated checks; PR review pending, no human review claimed |
 
-## Exact verification commands and results
+## Historical P0-01 verification commands and results
 
 Host: Windows, Node **24.14.1**, npm **11.19.1**, Python **3.13.12**, uv **0.13.7**,
 isolated PostgreSQL **18.3**. uv was installed into the ignored `.tools` venv.
