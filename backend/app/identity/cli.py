@@ -2,7 +2,7 @@ import argparse
 import getpass
 import warnings
 
-from sqlalchemy.exc import SQLAlchemyError
+from sqlalchemy.exc import IntegrityError, SQLAlchemyError
 from sqlalchemy.orm import Session
 
 from app.database import create_database_engine
@@ -57,8 +57,37 @@ def main() -> None:
             else:
                 manage_user(db, args.username, password)
         print("Identity operation completed; no company permissions granted.")
-    except (ValueError, EOFError, getpass.GetPassWarning, SQLAlchemyError):
-        parser.exit(1, "Identity operation failed; verify input and local database.\n")
+    except ValueError as error:
+        # Only known, static validation messages are safe to show to the operator.
+        message = str(error)
+        if message not in {
+            "Passwords do not match",
+            "Password must contain 15 to 128 characters",
+            "Invalid username",
+            "User not found",
+            "Distinct administrators required",
+            "Bootstrap already completed",
+        }:
+            message = "Invalid account input"
+        parser.exit(1, f"Identity operation failed: {message}.\n")
+    except (EOFError, getpass.GetPassWarning):
+        parser.exit(
+            1,
+            "Identity operation failed: hidden password input requires an interactive "
+            "terminal. Run setup-local.bat directly; do not pipe password input.\n",
+        )
+    except IntegrityError:
+        parser.exit(
+            1,
+            "Identity operation failed: account data conflicts with an existing "
+            "record or database constraint. Existing accounts were not reset.\n",
+        )
+    except SQLAlchemyError:
+        parser.exit(
+            1,
+            "Identity operation failed: database operation failed. "
+            "Check local connectivity and migrations.\n",
+        )
     finally:
         engine.dispose()
 

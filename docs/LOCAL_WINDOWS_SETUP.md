@@ -20,6 +20,12 @@ a username, then a hidden confirmed password of 15–128 characters. Choose N on
 repeat setups to retain accounts. No default credentials or administrator/company
 permissions are created; an existing username is never silently reset.
 
+If account creation fails, the identity CLI now distinguishes password mismatch,
+length/username validation, unavailable hidden input and database errors. A
+15-character password is valid; type exactly the same password at confirmation.
+Run the BAT in a normal interactive terminal and do not pipe password input.
+An account named `admin` is still an ordinary user; names grant no privileges.
+
 ```bat
 setup-local.bat
 start-local.bat

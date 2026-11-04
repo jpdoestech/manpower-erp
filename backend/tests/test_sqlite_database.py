@@ -1,3 +1,4 @@
+import sys
 from datetime import UTC, datetime, timedelta, timezone
 from uuid import uuid4
 
@@ -11,8 +12,9 @@ from test_sqlite_identity import disposable_database as disposable_database
 import app.database as database
 from alembic import command
 from app.database import LOCAL_DIRECTORY, create_database_engine, database_url
+from app.identity import cli
 from app.identity.models import AuthEvent, AuthSession, User
-from app.identity.security import auth_settings
+from app.identity.security import auth_settings, verify_password
 
 
 def test_unpatched_wal_runtime_is_rejected(
@@ -21,6 +23,30 @@ def test_unpatched_wal_runtime_is_rejected(
     monkeypatch.setattr(database, "sqlite_version_info", (3, 50, 4))
     with pytest.raises(RuntimeError, match="WAL-reset fix"):
         create_database_engine()
+
+
+def test_cli_accepts_exactly_15_characters_on_disposable_sqlite(
+    disposable_database: None,
+    monkeypatch: pytest.MonkeyPatch,
+    capsys: pytest.CaptureFixture[str],
+) -> None:
+    command.upgrade(Config("alembic.ini"), "head")
+    password = "A" * 15
+    monkeypatch.setattr("getpass.getpass", lambda _: password)
+    monkeypatch.setattr(sys, "argv", ["identity", "create-user", "example"])
+    cli.main()
+    output = capsys.readouterr()
+    assert "Identity operation completed" in output.out
+    assert password not in output.out + output.err
+    engine = create_database_engine()
+    try:
+        with Session(engine) as db:
+            user = db.scalar(select(User).where(User.username == "example"))
+            assert user and user.is_active and not user.is_super_admin
+            assert user.password_hash != password
+            assert verify_password(password, user.password_hash)
+    finally:
+        engine.dispose()
 
 
 def test_sqlite_offline_migration_is_explicitly_rejected(
