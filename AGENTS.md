@@ -12,6 +12,12 @@ Implement a secure multi-company ERP for Philippine manpower service contractors
 6. Update `tasks/STATUS.md` with completed work, evidence, open risks, next task, and changed files. Never mark a task Done with failing or missing mandatory tests.
 7. Never commit secrets. Do not push, deploy, overwrite production data, or generate fiscal documents in production without explicit authorization.
 
+## Repository delivery preference
+The user gives standing authorization to commit and push completed repository
+changes with a descriptive commit message and a summary of changes, checks and
+remaining limits. This does not authorize production deployment or production data
+changes. Never include secrets or claim unrun checks passed.
+
 ## Non-negotiable engineering rules
 - Company isolation on every company-owned record, query, export, background job and API; deny by default.
 - Branch/client/contract resource scoping; permissions enforced server-side; frontend hiding is insufficient.

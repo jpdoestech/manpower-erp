@@ -1,0 +1,7 @@
+{
+  "files": {
+    "includes": ["src/**", "*.json", "vite.config.ts", "!package-lock.json"]
+  },
+  "formatter": { "indentStyle": "space", "indentWidth": 2 },
+  "linter": { "rules": { "preset": "recommended" } }
+}

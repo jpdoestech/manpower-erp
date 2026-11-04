@@ -1,5 +1,21 @@
 # RBAC, Scope and Separation of Duties
 
+## P0-01 implemented access surface
+
+| Surface | Anonymous access | Company/role authority |
+|---|---|---|
+| Web bootstrap page | Public local development page | None |
+| GET /api/bootstrap | Public static product name and bootstrap stage | None |
+| /docs, /redoc, /openapi.json | Public development API documentation | None |
+| Business routes | Not implemented; 404 | Client headers grant no access |
+
+No user, company-owned record, approval, export or background job exists yet.
+The API tests prove the current route boundary only; scoped RBAC and tenant
+isolation are not implemented or certified. Add their regression tests with P1.
+Compose publishes only on loopback. Uvicorn access/error logs are the bootstrap
+diagnostics; structured observability is P0-02. Never put real employee or fiscal
+data in this development scaffold.
+
 ## Access layers
 Identity -> membership(s) in legal companies -> role grants scoped to company/head office/branch/client/contract -> resource action -> workflow constraints. Explicit deny supersedes grant. Default deny.
 

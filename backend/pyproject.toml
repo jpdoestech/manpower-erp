@@ -1,0 +1,27 @@
+[project]
+name = "manpower-api"
+version = "0.1.0"
+requires-python = ">=3.13,<3.14"
+dependencies = ["fastapi", "uvicorn", "psycopg[binary]"]
+
+[dependency-groups]
+dev = ["pytest", "ruff", "mypy", "pip-audit", "httpx2>=2.16.0"]
+
+[tool.uv]
+package = false
+
+[tool.ruff]
+target-version = "py313"
+
+[tool.ruff.lint]
+select = ["E", "F", "I", "UP", "B"]
+
+[tool.mypy]
+python_version = "3.13"
+strict = true
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+pythonpath = ["."]
+addopts = "--strict-markers"
+markers = ["integration: requires an explicit DATABASE_URL for a disposable PostgreSQL database"]

@@ -1,0 +1,75 @@
+:root {
+  font-family: "Segoe UI", sans-serif;
+  color: #173d34;
+  background: #f2f0e8;
+  font-synthesis: none;
+}
+* {
+  box-sizing: border-box;
+}
+body {
+  margin: 0;
+  border-top: 6px solid #173d34;
+}
+main {
+  max-width: 1000px;
+  margin: auto;
+  padding: 32px clamp(24px, 6vw, 72px);
+}
+header,
+footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 24px;
+  font-size: 11px;
+  letter-spacing: 0.12em;
+}
+header {
+  justify-content: flex-start;
+}
+.mark {
+  font:
+    bold 32px Georgia,
+    serif;
+  letter-spacing: -0.08em;
+}
+section {
+  margin: 72px 0;
+  border-top: 1px solid #b8c2b6;
+  padding-top: 32px;
+}
+.eyebrow {
+  font:
+    12px Consolas,
+    monospace;
+  letter-spacing: 0.12em;
+}
+h1 {
+  font:
+    normal clamp(42px, 8vw, 76px) / 1.1 Georgia,
+    serif;
+  letter-spacing: -0.045em;
+  margin: 24px 0 16px;
+}
+.intro {
+  font-size: 20px;
+  margin-bottom: 40px;
+}
+[role="status"] {
+  border-left: 3px solid #173d34;
+  background: #e4e9df;
+  padding: 14px 18px;
+  font-size: 14px;
+}
+.note {
+  font-size: 14px;
+  line-height: 1.6;
+  color: #4c5e54;
+  max-width: 440px;
+}
+footer {
+  border-top: 1px solid #b8c2b6;
+  padding-top: 20px;
+  flex-wrap: wrap;
+}
