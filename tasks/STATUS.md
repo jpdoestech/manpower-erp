@@ -21,6 +21,9 @@ and whitespace checks pass. Exact commands, corrected initial failures and limit
 are in tasks/WINDOWS_LOCAL_DEV.md. Hosted source gates pending. Local Docker Desktop
 boot/interactive Docker password TTY/browser opening remain unrun; no live startup
 claim. Existing human-review and P1-02 prerequisite states are unchanged.
+Initial hosted Linux gates passed; Windows failed because the missing-Docker test
+still discovered the runner's System32 Docker CLI. Fixture tool discovery isolated;
+launchers unchanged. Local tests/types/lint pass again; new hosted proof pending.
 
 ## P1-02 prerequisite audit and plan
 

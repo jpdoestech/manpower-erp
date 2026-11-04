@@ -128,7 +128,21 @@ class WindowsLaunchers(unittest.TestCase):
         self.assertEqual(self.commands(), "")
 
     def test_missing_docker_fails_with_guidance(self) -> None:
-        self.env["PATH"] = self.env["PATH"].split(os.pathsep, 1)[1]
+        # Hosted Windows may ship Docker in System32; isolate discovery too.
+        (self.stub / "docker.cmd").unlink()
+        shutil.copyfile(
+            Path(os.environ["SystemRoot"]) / "System32/where.exe",
+            self.stub / "where.exe",
+        )
+        self.env["PATH"] = str(self.stub)
+        subprocess.run(
+            [str(self.stub / "where.exe"), "where.exe"],
+            cwd=self.temp.name,
+            env=self.env,
+            capture_output=True,
+            check=True,
+            timeout=10,
+        )
         result = self.run_script("run.bat")
         self.assertNotEqual(result.returncode, 0)
         self.assertIn("Docker was not found", result.stdout)

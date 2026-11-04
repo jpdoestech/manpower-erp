@@ -80,3 +80,9 @@ push. No application test rerun locally claimed; unchanged runtime gates run in 
 Changed files: setup.bat, run.bat, scripts/tests/test_windows_launchers.py,
 .gitattributes, .github/workflows/ci.yml, README.md, docs/OPERATIONS.md,
 tasks/WINDOWS_LOCAL_DEV.md, STATUS.md, DECISIONS.md. No .env or credentials tracked.
+
+First hosted source run 41781977728: Linux backend/frontend/Compose passed;
+Windows had 7 passing cases and one fixture failure. The runner ships Docker in
+System32, so the missing-Docker case still discovered a real CLI. Corrected only
+the fixture by retaining a copied system where.exe on an isolated PATH and removing
+its Docker stub; launchers were unchanged. Do not count that failed run as passing.
