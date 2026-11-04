@@ -1,6 +1,11 @@
 # Architecture and Data Governance
 
 ## Recommended stack (subject to ADR confirmation)
+
+P0-02 decisions are documented in `docs/adr/` and indexed in `tasks/DECISIONS.md`.
+SQLAlchemy/Alembic, session lifecycle, health and diagnostic contracts are the
+implemented infrastructure; the domain/security policies below remain design
+requirements until their roadmap slices. See `docs/OPERATIONS.md` for commands.
 React + TypeScript frontend, Python FastAPI backend, PostgreSQL, managed object storage, background task queue, Docker-based local development. Start as a modular monolith with well-defined module boundaries.
 
 ## Modules

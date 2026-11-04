@@ -30,11 +30,18 @@ jobs:
       - run: uv sync --locked
       - run: uv run --locked ruff format --check .
       - run: uv run --locked ruff check .
-      - run: uv run --locked mypy app tests
+      - run: uv run --locked mypy app tests alembic
       - run: uv run --locked pytest -q -m "not integration"
       - run: uv run --locked pytest -q -m integration
+      - name: Verify migration CLI on clean service database
+        run: |
+          uv run --locked alembic upgrade head
+          uv run --locked alembic upgrade head
+          uv run --locked alembic check
+          uv run --locked alembic downgrade base
+          uv run --locked alembic upgrade head
+          uv run --locked alembic check
       - run: uv run --locked pip-audit
-      # No schema in P0-01. Migration up/down becomes mandatory with P0-02.
   frontend:
     runs-on: ubuntu-latest
     defaults:
@@ -62,11 +69,18 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
-          printf 'POSTGRES_PASSWORD=%s\n' "$(openssl rand -hex 24)" > .env
+          printf 'POSTGRES_PASSWORD=%s\n' "p@ss/$(openssl rand -hex 24)%#" > .env
           docker compose config --quiet
           docker compose up --build --wait --wait-timeout 180
           curl --fail http://127.0.0.1:5173/ | grep -q '<title>Manpower ERP</title>'
           python -c 'import json, urllib.request; assert json.load(urllib.request.urlopen("http://127.0.0.1:5173/api/bootstrap")) == {"name": "Manpower ERP", "stage": "bootstrap"}'
+          python -c 'import json, urllib.request; assert json.load(urllib.request.urlopen("http://127.0.0.1:8000/api/health/live")) == {"status": "live"}; assert json.load(urllib.request.urlopen("http://127.0.0.1:5173/api/health/ready")) == {"status": "ready"}'
+          docker compose stop db
+          test "$(curl -s -o /dev/null -w '%{http_code}' http://127.0.0.1:8000/api/health/live)" = 200
+          test "$(curl -s -o /dev/null -w '%{http_code}' http://127.0.0.1:8000/api/health/ready)" = 503
+          docker compose start db
+          curl --fail --retry 15 --retry-all-errors --retry-delay 2 http://127.0.0.1:8000/api/health/ready
+          docker compose exec -T api .venv/bin/alembic check
           before=$(docker compose exec -T db psql -U manpower -d manpower -Atc 'SELECT system_identifier FROM pg_control_system()')
           docker compose down
           docker compose up --wait --wait-timeout 180

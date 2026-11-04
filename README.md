@@ -1,8 +1,9 @@
 # Manpower ERP
 
 Philippine manpower accounting ERP. P0-01 provides a local React/TypeScript page,
-FastAPI API and PostgreSQL development database. Business modules, authentication,
-schema migrations and accounting/tax rules are not implemented yet.
+FastAPI API and PostgreSQL development database. P0-02 adds SQLAlchemy sessions,
+Alembic migration history, health checks and safe JSON diagnostics. Business modules,
+authentication and accounting/tax rules are not implemented yet.
 
 Read [AGENTS.md](AGENTS.md), [the roadmap](tasks/ROADMAP.md),
 [status/evidence](tasks/STATUS.md) and [decisions](tasks/DECISIONS.md) before changes.
@@ -32,7 +33,9 @@ Open [the application](http://127.0.0.1:5173),
 [bootstrap metadata](http://127.0.0.1:8000/api/bootstrap) and
 [OpenAPI documentation](http://127.0.0.1:8000/docs).
 The page should show **API connected**. That message confirms the API response;
-it does not check database readiness. PostgreSQL readiness is checked by Compose.
+it does not check database readiness. Check [readiness](http://127.0.0.1:8000/api/health/ready)
+and [liveness](http://127.0.0.1:8000/api/health/live) separately. Compose runs migrations
+before API startup and probes readiness. The baseline creates only migration history.
 
 ```sh
 docker compose ps
@@ -57,14 +60,21 @@ use `uv sync --locked` and `npm ci`, not unlocked installs for verification.
 
 Start just PostgreSQL with `docker compose up -d --wait db`, or use a separate
 local PostgreSQL 18 database you own. Never point the tests at a shared database.
-The bootstrap API currently serves static metadata without opening a DB connection.
+The bootstrap API serves static metadata without opening a DB connection. The API
+process now requires valid database configuration at startup; unavailable PostgreSQL
+fails readiness while liveness remains available. Native API/Alembic do not load
+`.env` automatically. Export DATABASE_URL in terminal 1 before running the commands
+below (PowerShell: `$env:DATABASE_URL = 'postgresql://USER:PASSWORD@127.0.0.1:5432/DB'`;
+bash: `export DATABASE_URL='postgresql://USER:PASSWORD@127.0.0.1:5432/DB'`).
+Use your own local database credentials and URL-encode special password characters.
 
 Terminal 1:
 
 ```sh
 cd backend
 uv sync --locked
-uv run --locked uvicorn app.main:app --reload --host 127.0.0.1 --port 8000
+uv run --locked alembic upgrade head
+uv run --locked uvicorn app.main:app --reload --host 127.0.0.1 --port 8000 --no-access-log
 ```
 
 Terminal 2:
@@ -86,7 +96,7 @@ From `backend/`:
 uv sync --locked
 uv run --locked ruff format --check .
 uv run --locked ruff check .
-uv run --locked mypy app tests
+uv run --locked mypy app tests alembic
 uv run --locked pytest -q -m "not integration"
 uv run --locked pip-audit
 ```
@@ -101,9 +111,26 @@ loaded by pytest. Then run:
 uv run --locked pytest -q -m integration
 ```
 
-An unset URL fails the integration test rather than silently skipping it. The test
-uses a session-local temporary table and rollback; no domain tables are created.
-No migrations exist in P0-01; up/down tests become mandatory with P0-02.
+An unset URL fails integration tests rather than silently skipping them. Migration
+and session tests create/drop UUID-named disposable databases on that test server;
+the test-only role needs CREATE DATABASE. The original test uses a session-local
+temporary table. No ERP domain tables are created in the configured input database.
+Never point tests at production or grant database-creation rights to runtime roles.
+
+To verify the baseline CLI on an owned disposable database:
+
+```sh
+uv run --locked alembic upgrade head
+uv run --locked alembic check
+uv run --locked alembic downgrade base
+uv run --locked alembic upgrade head
+uv run --locked alembic check
+```
+
+The no-op baseline owns no business data; future downgrades need individual safety
+review. See [operations](docs/OPERATIONS.md) for lifecycle, configuration, migration
+rollback, health/error contracts and log-derived metrics design; see
+[ADRs](tasks/DECISIONS.md) for pending stakeholder/CPA decisions.
 
 From `frontend/`:
 
@@ -123,8 +150,9 @@ in frontend. When intentionally updating Python dependencies, run `uv lock` then
 and relevant checks. Never commit `.env`, credentials, dependency directories,
 database clusters or logs.
 
-CI also boots Compose from scratch, checks the web/proxied API over HTTP, then
-recreates containers and verifies the same database cluster identifier survives.
+CI also boots Compose from scratch, checks the web/proxied API and health over
+HTTP, stops PostgreSQL to prove live/ready distinguish an outage, checks recovery,
+then recreates containers and verifies the same database cluster identifier survives.
 CI uses disposable service credentials and deletes its own test volumes at the end.
 Hosted CI results require a real GitHub run; see STATUS for what was actually run.
 
