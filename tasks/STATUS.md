@@ -1,11 +1,37 @@
 # Project Status — Codex Must Maintain
 
 Last updated: 2026-11-04
-Current requested milestone: CR-002B completion, CR-002C technical plan only
-Current task status: REVIEW; CR-002B implementation and automated gates verified
+Current requested milestone: UI-001 independent responsive ERP design system
+Current task status: IN_PROGRESS; implementation present, final automated evidence pending
 Repository inspected: YES; fetched main b3517d3, P0-02 4fd3914, P1-01 dc7fca3; clean before new branch
 Implemented code: existing P0/P1 foundations plus technical account administration/recovery follow-up; no company/finance modules
 Validated requirements: follow-up 5ca0ad3 has 6/6 hosted checks, 92 backend/13 frontend tests, migrations and Docker gates pass
+
+## UI-001 — Independent responsive frontend foundation
+
+Explicitly authorized separate branch feature/ui-001-design-system from verified
+fbaa78c (#9). Fresh fetch finds main b3517d3 and PRs #1–#9 open/unmerged (#4 draft).
+Connector reviews for #2/#3/#9 are empty; no human acceptance is manufactured.
+
+Implemented native reusable controls, keyboard tabs/modal dialogs, table/states,
+toast/skeleton patterns; validated-session shell with collapsible sidebar,
+breadcrumbs, account controls, theme, static module search and notification
+placeholder. Phones use bottom navigation/modal drawer and module lists; tablets,
+laptops and desktop use responsive rails/sidebar, cards and compact tables.
+Unavailable scope selector and administration never grant access. No backend,
+schema, credentials, production setting, business logic or auth provider change.
+
+Local frontend: 27 unit/component/auth tests, 27 browser checks across nine
+320–2560px profiles, formatting/lint/types/build/audit pass. Browser axe scans
+and focus/keyboard checks pass; phone/light and desktop/dark screenshots inspected.
+Backend 110 unit/SQLite tests pass (21.00s); Ruff/mypy pass (37 files). Exact
+commands, changed files and initial corrected failures: UI-001.md. Actual native
+test launcher and hosted PG/Compose/Windows migration/startup gates pending.
+Original local API/web listeners remain 8000:23068 and 5173:27032; no reset/stop.
+
+Design/architecture docs and ADR-016 are added; CR-002B/P1-01 acceptance is still
+pending. No merges or deployment. Physical devices, Safari/Firefox and human
+screen-reader/usability review remain unverified. UI-001 not marked DONE.
 
 ## CR-002B — Completed tools, acceptance pending
 

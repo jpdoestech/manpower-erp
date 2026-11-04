@@ -1,5 +1,13 @@
 # Decision Log (ADRs Index)
 
+UI-001 (explicit request, 2026-11-04): [ADR-016](../docs/adr/ADR-016-ui.md)
+retains React/TypeScript/Vite and native HTML + shared CSS tokens after evaluating
+Tailwind/headless alternatives. Add dev-only Playwright/axe for real viewport,
+keyboard and accessibility regressions. AuthPanel remains session/CSRF authority;
+context/admin controls stay unavailable without backend scope/capability evidence.
+Phone/tablet/laptop/large-screen layouts share primitives, with touch targets and
+safe-area navigation. No business logic, role grant or pending acceptance bypass.
+
 CR-002B completion (explicit request, 2026-11-04):
 [ADR-015](../docs/adr/ADR-015-local-recovery.md) uses held Windows locks and scoped
 cooperative stop instead of PID-file authority; SQLite backup API and validated,
