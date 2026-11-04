@@ -8,6 +8,10 @@ Restore revokes ephemeral authentication capabilities and records a local audit
 event while retaining historical UUIDs. No PostgreSQL/auth policy weakening or
 production recovery assertion. C is planned only in CR-002C.md; its implementation
 requires B acceptance. Pending P1-01 human reviews are unchanged.
+Source 22b437b in [PR #9](https://github.com/jpdoestech/manpower-erp/pull/9)
+passes all 10 matching-head branch/PR checks, including the complete fresh Windows
+nine-command workflow and real PG regressions. ADR-015 implementation is verified;
+B remains REVIEW pending acceptance. No C implementation or human approval inferred.
 
 2026-11-04 subsequent user request explicitly authorizes Docker-free setup/start
 BATs now. Implement only that B slice, stacked on verified A (65246ba), without

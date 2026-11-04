@@ -110,3 +110,63 @@ setup/start/check/backup/repeated stop/restore/reset/repeated migration, then it
 last frontend test command fails: npm's .cmd shim splits the ampersand in the
 isolated checkout path. Invoke the same installed Vitest CLI via Node directly,
 matching the existing Vite launcher. Keep the spaces/ampersand fixture intact.
+
+The direct Node/Vitest regression passes 13 tests (4.63s) in an actual isolated
+checkout path containing spaces and an ampersand, npm ci/audit 0 vulnerabilities.
+
+## Changed files (completion scope)
+
+Added: backup-local-db.bat, check-local.bat, migrate-local.bat, reset-local-db.bat,
+restore-local-db.bat, stop-local.bat, test-local.bat;
+scripts/windows/database_tools.py, scripts/windows/runtime.py;
+scripts/tests/test_database_launchers.py; docs/adr/ADR-015-local-recovery.md;
+tasks/CR-002B-completion.md, tasks/CR-002C.md.
+
+Modified: scripts/windows/local.py, scripts/tests/test_native_launchers.py,
+.github/workflows/ci.yml, .gitignore, AGENTS.md, README.md,
+docs/ARCHITECTURE.md, docs/DATABASE_MODES.md, docs/LOCAL_WINDOWS_SETUP.md,
+docs/SECURITY_RBAC.md, tasks/CR-002.md, tasks/DECISIONS.md,
+tasks/ROADMAP.md, tasks/STATUS.md. Existing setup-local/start-local BATs are reused
+unchanged, and backend/frontend application/schema/dependency locks are unchanged.
+
+## Final verified implementation — REVIEW
+
+Source **22b437b2abe75ae19a95d5040785a7efd2d3e5a6** in
+[PR #9](https://github.com/jpdoestech/manpower-erp/pull/9), stacked on #8, passes
+**10/10** branch/PR checks:
+[push 41840454394](https://github.com/jpdoestech/manpower-erp/actions/runs/41840454394),
+[PR 41840462879](https://github.com/jpdoestech/manpower-erp/actions/runs/41840462879).
+
+| Verification | Exact command / result |
+|---|---|
+| SQLite/backend (Windows CI) | `uv run --locked pytest -q -m "not integration"`: 110 passed / 42 deselected, 14.39s |
+| PostgreSQL (Linux CI) | `uv run --locked pytest -q -m integration`: 42 passed / 110 deselected, 12.54s; real PostgreSQL service |
+| Backend/unit (Linux CI) | Same non-integration command: 110 passed, 9.55s |
+| Windows fresh workflow + safety | `ERP_NATIVE_SMOKE=1`, `uv run --locked python -m unittest discover -s ../scripts/tests -p "test_*launchers.py" -v`: 30 passed, 198.484s, no skips |
+| Existing BAT regressions | Separate Windows job: 8 passed, 4.737s (included in the 30 above) |
+| Type checking | `uv run --locked mypy app tests alembic ../scripts`: 37 files; Windows scripts check: 6 files; both pass |
+| Formatting/lint | Existing Ruff format/check across backend/scripts, Biome and TypeScript gates pass |
+| Frontend | 13 tests and production build pass; local final direct-Node path regression: 13 passed, 4.63s |
+| Migrations | SQLite clean/repeat/failure recovery and native migrate twice pass; PG CLI up/repeat/check/down/up/check passes |
+| Security/static | pip-audit/npm audit: no known vulnerabilities; actionlint, Compose config and whitespace pass |
+
+Native CI prints verified command names for setup (twice), start/readiness, check,
+live backup, stop (twice), restore, reset, restore, migrate (twice), check and test.
+It checks real HTTP ordinary-user login/me/CSRF logout, repeated-start refusal,
+restored identity/audit/session UUIDs and guard presence, backup while a writer
+holds uncommitted changes, restore token/session revocation, failed migration/
+replacement recovery, cancellation and unsafe path/FK/guard/version rejection.
+No real password, default administrator or self-approval bypass is used.
+
+User's original listeners retain the same PIDs (8000:23068, 5173:27032); no local
+full fixed-port smoke or destructive operation touched that instance. Real hidden
+TTY entry, browser opening, forced X/OS-crash cleanup and corrupt-active-DB manual
+salvage remain unrun/outside supported automatic recovery. Use Enter/stop for
+managed shutdown; old launchers use their own Enter once. Backups are unencrypted,
+trusted/current-revision/local only; network/cloud-sync storage is unsupported.
+
+Implementation is complete and automated gates pass; **B acceptance remains
+pending**, so status is REVIEW. Evidence-only docs follow this verified source.
+P1-01 human security acceptance remains pending; no merges/deployments/production
+data changes. Recommended next task: **CR-002C**, plan prepared in CR-002C.md;
+implement only after B acceptance. No C SDK/verifier/mapping/grants were added.

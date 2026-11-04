@@ -2,12 +2,12 @@
 
 Last updated: 2026-11-04
 Current requested milestone: CR-002B completion, CR-002C technical plan only
-Current task status: IN_PROGRESS; remaining tools implemented, verification underway
+Current task status: REVIEW; CR-002B implementation and automated gates verified
 Repository inspected: YES; fetched main b3517d3, P0-02 4fd3914, P1-01 dc7fca3; clean before new branch
 Implemented code: existing P0/P1 foundations plus technical account administration/recovery follow-up; no company/finance modules
 Validated requirements: follow-up 5ca0ad3 has 6/6 hosted checks, 92 backend/13 frontend tests, migrations and Docker gates pass
 
-## CR-002B — Requested setup/start slice
+## CR-002B — Completed tools, acceptance pending
 
 Completion follow-up: feature/cr-002b-completion starts at verified 9e44c96 (#8).
 Fresh fetch/connector audit: #6/#7/#8 open/unmerged, no reviews, each 10/10 checks.
@@ -17,6 +17,25 @@ confirmed replacement helpers. Preserved latest CLI diagnostics and all app/PG
 behavior. Existing user API/web remain running and untouched; fixed-port real
 local smoke is skipped, actual nine-tool smoke is required on Windows CI.
 CR-002C.md is a technical plan only. P1-01 human acceptance remains pending.
+
+Verified source 22b437b in [PR #9](https://github.com/jpdoestech/manpower-erp/pull/9)
+passes all 10 branch/PR checks:
+[push 41840454394](https://github.com/jpdoestech/manpower-erp/actions/runs/41840454394),
+[PR 41840462879](https://github.com/jpdoestech/manpower-erp/actions/runs/41840462879).
+Hosted Windows: 110 unit/SQLite tests (14.39s), 30 launcher/database safety tests
+including real nine-tool fresh flow (198.484s, no skips). Hosted PostgreSQL:
+42 integration tests (12.54s), migration CLI and Docker regressions pass. Frontend
+13 tests/build, Ruff/Biome/TypeScript, mypy both platforms, audits and static checks
+pass. Exact commands, initial failures/fixes, 27 changed files and backup/restore
+proof: CR-002B-completion.md. Local test-local.bat exits 0 (110 backend, 29 safety
+passes/one opt-in smoke skipped, 13 frontend); user's live app/DB untouched.
+
+All nine native commands are documented in LOCAL_WINDOWS_SETUP.md. Restore/reset
+are confirmed/offline/recoverable; restored authentication capabilities are revoked.
+Existing listeners keep their original PIDs. Unencrypted current-revision snapshots,
+unmanaged/crashed owners, manual corrupt-DB salvage and interactive TTY/browser
+limits are documented. B is REVIEW, not accepted; C remains plan-only until
+acceptance. No production changes, merges or manufactured security decisions.
 
 Local provisioning follow-up: user reported a generic failure after password
 confirmation. Supplied password satisfies length policy; read-only local check
