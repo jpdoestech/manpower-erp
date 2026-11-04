@@ -1,6 +1,6 @@
 # P1-01 follow-up — administrator account controls
 
-2026-11-04. REVIEW; local checks pass, hosted CI and security acceptance pending. Branch
+2026-11-04. REVIEW; local/hosted checks pass, human security acceptance pending. Branch
 `feature/p1-01-account-controls` starts at `dc7fca3`, stacked on open PR #2.
 
 ## Audit and requirement change CR-001 (before code)
@@ -93,7 +93,7 @@ health/logging/connection/validation regressions remain passing. Concurrent boot
 approval and token redemption are tested on real PostgreSQL, not mocks. Existing CI
 already runs all new tests/current-head migrations plus Docker health/auth/persistence;
 no additional workflow/dependency is needed. Local Docker engine remains unavailable;
-hosted execution is pending, not counted as passed.
+hosted execution below verifies the Linux container gates.
 
 Initial run: 14 failed/75 passed. The new fixture reused a cookie when logging in a
 second admin (correctly revoking the first), and one baseline expected the old head.
@@ -120,6 +120,27 @@ MFA enforcement remain human security gates. Original CLI is privileged operator
 access; it is not claimed to enforce application approval against a DB owner.
 No refresh tokens exist; opaque sessions rotate on login and expire absolutely.
 
-Next: commit/push, stacked PR into feature/p1-01-authentication, verify hosted gates;
-retain REVIEW until human security acceptance. P1-02 only after that gate and a
-separate authorization. No merge or production data changes.
+## Hosted verification / delivery
+
+Implementation `5ca0ad3ab96e1e0fb3ea68f83ddc6302d5c061c3` pushed; [PR #3](https://github.com/jpdoestech/manpower-erp/pull/3)
+is open into feature/p1-01-authentication. PR #1/#2 remain open; main unchanged.
+GitHub UI confirms exact-head **6/6 successful checks**:
+
+- [Push CI 41765130592](https://github.com/jpdoestech/manpower-erp/actions/runs/41765130592): backend 126361592065 (51s), frontend 126361592405 (21s), compose 126361592386 (1m).
+- [PR CI 41765194928](https://github.com/jpdoestech/manpower-erp/actions/runs/41765194928): backend 126361800206 (1m), frontend 126361799803 (13s), compose 126361800143 (1m).
+- PR backend logs: **50 passed/42 deselected in 1.66s** (unit/API),
+  **42 passed/50 deselected in 13.79s** (PostgreSQL integration).
+  All 92 source tests passed after the final reactivation change.
+- Hosted CLI clean upgrade/repeat/check/downgrade/re-upgrade/check passes at
+  0003_account_controls. Docker boot/migration ordering, HTTP authentication before/
+  after recreation, original health/outage/recovery/persistence and both audits pass.
+
+Source gates verified via authenticated GitHub UI without extracting credentials.
+Inherited Node-action/Ubuntu runner annotations remain non-failing maintenance
+notices. Local native psql executable was unavailable; an equivalent psycopg probe
+verified input DB public tables = 0 and generated test databases remaining = 0.
+Local PostgreSQL stopped. No preview credentials/accounts outside disposable tests.
+
+Only evidence docs change after the verified source commit. Retain REVIEW until
+human security acceptance; P1-02 only after that gate and separate authorization.
+No merge, production data change/deployment or additional roadmap implementation.

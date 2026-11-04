@@ -2,10 +2,10 @@
 
 Last updated: 2026-11-04
 Current milestone: P1-01
-Current task status: REVIEW (expanded P1-01 local gates pass; hosted CI and human security review pending)
+Current task status: REVIEW (expanded P1-01 local/hosted gates pass; human security acceptance pending)
 Repository inspected: YES; fetched main b3517d3, P0-02 4fd3914, P1-01 dc7fca3; clean before new branch
 Implemented code: existing P0/P1 foundations plus technical account administration/recovery follow-up; no company/finance modules
-Validated requirements: baseline P1-01 dc7fca3 has 6/6 hosted checks; follow-up 92 backend/13 frontend tests and local quality gates pass
+Validated requirements: follow-up 5ca0ad3 has 6/6 hosted checks, 92 backend/13 frontend tests, migrations and Docker gates pass
 
 ## Current P1-01 CR-001 follow-up
 
@@ -25,11 +25,21 @@ safe downgrade/re-upgrade plus history/grant refusal. Concurrent approval/recove
 bootstrap and server authorization tests pass. No dependency versions changed.
 
 Exact commands, initial failures/corrections, changed-file ledger and limitations:
-[P1-01-account-controls.md](P1-01-account-controls.md). Existing CI runs all new
-tests/current migrations; hosted source checks are still pending. Local Windows
-Docker execution unavailable. Human security acceptance remains required. Initial
+[P1-01-account-controls.md](P1-01-account-controls.md). Implementation commit
+`5ca0ad3ab96e1e0fb3ea68f83ddc6302d5c061c3` in [PR #3](https://github.com/jpdoestech/manpower-erp/pull/3)
+passes all six exact-head GitHub checks: [push CI 41765130592](https://github.com/jpdoestech/manpower-erp/actions/runs/41765130592)
+and [PR CI 41765194928](https://github.com/jpdoestech/manpower-erp/actions/runs/41765194928).
+PR backend logs: 50 unit/API passed (1.66s), 42 PostgreSQL integration passed
+(13.79s). All source tests pass after final hardening. Migration CLI and Linux
+Docker boot/authentication/outage/recovery/persistence pass. Existing Node/runner
+annotations are non-failing maintenance notices. No lock/dependency changes.
+Local probe via psycopg verifies 0 input public tables and 0 generated DBs remaining;
+PostgreSQL stopped. Native psql unavailable; equivalent probe succeeded. Local
+Windows Docker execution unavailable. Human security acceptance remains required. Initial
 admin operator pair/manual private token delivery/MFA/production recovery and
 permissions require review. No company grants, P1-02, merge or production deployment.
+PR #3 stacks on #2; #1/#2 remain open. Next: review P1-01, then separately authorize
+P1-02 after acceptance. Documentation-only evidence follows the verified source.
 
 ## Historical P1-01 foundation outcome (before CR-001)
 
