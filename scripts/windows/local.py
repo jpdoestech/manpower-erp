@@ -196,7 +196,7 @@ def offline() -> Iterator[None]:
 
 
 def test_local() -> None:
-    _, npm = tools()
+    node, _ = tools()
     settings = environment()
     # Tests select disposable databases themselves; never supply the active URL.
     for key in list(settings):
@@ -222,7 +222,13 @@ def test_local() -> None:
         "-v",
         settings=settings,
     )
-    run(npm, "test", cwd=ROOT / "frontend")
+    # Avoid npm's Windows .cmd shim splitting checkout paths containing '&'.
+    run(
+        node,
+        str(ROOT / "frontend/node_modules/vitest/vitest.mjs"),
+        "run",
+        cwd=ROOT / "frontend",
+    )
 
 
 def check_local() -> None:

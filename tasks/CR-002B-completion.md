@@ -103,3 +103,10 @@ Windows CI type-checks the helper as well. The full Windows flow reached its fin
 test-local step; its nested legacy BAT tests failed because the disposable source
 copy omitted Docker fixture files. Copy those existing fixture inputs too; no
 Docker execution introduced. No failing check is accepted or suppressed.
+
+Second hosted source 905ad83 passes Linux backend (110 unit/SQLite, 42 PostgreSQL,
+migration CLI/audit), Compose/frontend and existing BAT gates. Windows verifies
+setup/start/check/backup/repeated stop/restore/reset/repeated migration, then its
+last frontend test command fails: npm's .cmd shim splits the ampersand in the
+isolated checkout path. Invoke the same installed Vitest CLI via Node directly,
+matching the existing Vite launcher. Keep the spaces/ampersand fixture intact.
