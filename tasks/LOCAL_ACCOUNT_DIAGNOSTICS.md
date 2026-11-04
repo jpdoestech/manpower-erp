@@ -33,3 +33,15 @@ Hosted PostgreSQL/Windows/frontend/Docker regression evidence pending after push
 `uv run --locked python -m unittest discover -s ../scripts/tests -p 'test_*launchers.py' -v`:
 16 passed / 1 opt-in native smoke skipped (17 discovered), 11.986s. No new local
 interactive TTY/browser, PostgreSQL or Docker execution is claimed.
+
+Hosted verification: implementation `91cc2d4df21655be63261e8f6568140da376f4dc`
+passes all 10 matching-head branch/PR checks in
+[PR #8](https://github.com/jpdoestech/manpower-erp/pull/8):
+[push 41824392925](https://github.com/jpdoestech/manpower-erp/actions/runs/41824392925),
+[PR 41824514925](https://github.com/jpdoestech/manpower-erp/actions/runs/41824514925).
+PostgreSQL integration/migration CLI, real native Windows smoke, existing BATs,
+frontend and Docker/audit jobs pass. Evidence-only documentation follows source.
+Diagnostic change is REVIEW; original interactive cause is unconfirmed. Retry
+with a new privately entered password and exact confirmation to obtain the actual
+error category if it recurs. No user account created/reset, no merge/deployment
+or formal security acceptance. Supplied credentials are never included in evidence.
