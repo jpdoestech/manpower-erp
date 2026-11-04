@@ -1,13 +1,22 @@
 # Project Status — Codex Must Maintain
 
 Last updated: 2026-11-04
-Current requested milestone: CR-002B explicitly requested local setup/start slice
-Current task status: REVIEW; requested setup/start slice passes local/hosted gates
+Current requested milestone: Local account provisioning diagnostic follow-up
+Current task status: IN_PROGRESS; local diagnostic tests pass, hosted gates pending
 Repository inspected: YES; fetched main b3517d3, P0-02 4fd3914, P1-01 dc7fca3; clean before new branch
 Implemented code: existing P0/P1 foundations plus technical account administration/recovery follow-up; no company/finance modules
 Validated requirements: follow-up 5ca0ad3 has 6/6 hosted checks, 92 backend/13 frontend tests, migrations and Docker gates pass
 
 ## CR-002B — Requested setup/start slice
+
+Local provisioning follow-up: user reported a generic failure after password
+confirmation. Supplied password satisfies length policy; read-only local check
+shows revision 0004, no admin-name account and no FK violations. Original cause
+is unconfirmed because CLI suppressed the category. Add sanitized actionable
+operator errors and a synthetic exact-15-character SQLite CLI regression;
+plan/evidence: LOCAL_ACCOUNT_DIAGNOSTICS.md. No user account/password modified,
+no password policy or API/security change. Local 110 non-integration tests pass
+(24.55s); Ruff format/lint and strict mypy pass (34 files). Hosted gates pending.
 
 Added setup-local.bat/start-local.bat and scripts/windows/local.py. Setup uses
 existing uv 0.13.7, repository-managed Python 3.13.18, locked dependencies/npm ci,
