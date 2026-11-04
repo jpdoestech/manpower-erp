@@ -4,6 +4,24 @@ P0-02 infrastructure plus P1-01 local authentication. No production deployment,
 company memberships, tenant business data or financial workflows.
 Infrastructure decisions are indexed in `tasks/DECISIONS.md` and `docs/adr/`.
 
+## Windows launchers
+
+Double-click root `setup.bat` once, then `run.bat` for normal local use. Docker
+Desktop must be installed, running and in Linux-container mode on its local
+default context. The scripts build/start/wait using existing Compose health and
+migration dependencies; they pin the Compose file/env/project explicitly. Setup
+creates a cryptographically random DB secret only for an absent `.env`, never
+overwrites an existing file, and optionally invokes the existing ordinary-user CLI
+with hidden confirmed passwords. Existing account names are not reset on failure.
+The internal `run.bat --setup` path suppresses browser/pause while setup calls it.
+Normal run opens the fixed loopback URL only after successful startup/readiness.
+
+No Windows software installer, Super Admin grant, automatic test account, security
+acceptance, volume deletion or production operation is included. Native Docker
+Desktop execution is separate from the Windows stub tests; use CI evidence and
+STATUS to see what was actually run. The API runtime container excludes test
+dependencies, so use README's native/CI test commands rather than container pytest.
+
 ## Database configuration and lifecycle
 
 Native API/Alembic requires an explicitly exported `DATABASE_URL`, using

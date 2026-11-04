@@ -7,6 +7,21 @@ Repository inspected: YES; fetched main b3517d3, P0-02 4fd3914, P1-01 dc7fca3; c
 Implemented code: existing P0/P1 foundations plus technical account administration/recovery follow-up; no company/finance modules
 Validated requirements: follow-up 5ca0ad3 has 6/6 hosted checks, 92 backend/13 frontend tests, migrations and Docker gates pass
 
+## Windows local launchers — separate authorized contributor task
+
+User requested setup/run BAT files. Created feature/windows-local-launchers from
+d8d1cd6, with a separate PR planned; P1-02 remains blocked and no dependent feature
+implementation is authorized. Pre-code plan/tests: tasks/WINDOWS_LOCAL_DEV.md.
+Added setup.bat/run.bat around existing local Compose startup, safe one-time .env
+generation, optional existing ordinary-user CLI, visible errors and readiness.
+No application/migration/authorization logic changed. Windows shell regression
+tests and CI job added. Local 8 tests pass using real cmd/PowerShell with a Docker
+stub; Ruff format/lint and strict mypy pass (27 files), Compose config, actionlint
+and whitespace checks pass. Exact commands, corrected initial failures and limits
+are in tasks/WINDOWS_LOCAL_DEV.md. Hosted source gates pending. Local Docker Desktop
+boot/interactive Docker password TTY/browser opening remain unrun; no live startup
+claim. Existing human-review and P1-02 prerequisite states are unchanged.
+
 ## P1-02 prerequisite audit and plan
 
 The user explicitly confirmed P1-01 security acceptance has not been granted or
