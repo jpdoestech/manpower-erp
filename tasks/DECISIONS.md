@@ -14,6 +14,13 @@
 | ADR-012 | Technical administrators, independent account approval and single-use recovery | LOCAL/HOSTED VERIFIED; HUMAN SECURITY REVIEW PENDING | Add missing P1-01 controls without company RBAC | Security lead |
 | ADR-013 | Company identities, dated branch engagements and explicit bootstrap scopes | PROPOSED ONLY; P1-02 PREREQUISITE BLOCKED | Shared client identity with company isolation; no implicit technical-admin access | Security/architecture reviewers |
 
+User confirmation: no human P1-01 security acceptance exists yet. The formal
+[security acceptance checklist](SECURITY_ACCEPTANCE_P1-01.md) has independent
+PR #2/#3 records both PENDING HUMAN REVIEW; no reviewer/date/approval/reference is
+invented. ADR-011/012 remain pending human acceptance, ADR-013 remains proposed,
+and P1-02 remains blocked at prerequisite. Only actual qualified reviewer evidence
+and verified conditions may change those decisions; passing CI alone cannot.
+
 P1-02 proposal: [ADR-013](../docs/adr/ADR-013-organizations.md) and
 [task plan](P1-02.md). Fresh fetch/CI diagnostics confirm all three prerequisite PRs
 are open/unmerged with matching-head 6/6 checks. P1-01 #2/#3 have no recorded reviews

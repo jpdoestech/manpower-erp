@@ -9,6 +9,18 @@ Validated requirements: follow-up 5ca0ad3 has 6/6 hosted checks, 92 backend/13 f
 
 ## P1-02 prerequisite audit and plan
 
+The user explicitly confirmed P1-01 security acceptance has not been granted or
+recorded. Added `tasks/SECURITY_ACCEPTANCE_P1-01.md`: separate pinned PR #2/#3
+review records are PENDING HUMAN REVIEW, all checklist items unchecked, identities/
+dates/decisions/conditions/GitHub references unfilled. It covers authentication,
+sessions, CSRF, provisioning/recovery, technical admins, audit, company-access
+boundaries and outstanding MFA/recovery/operator/production risks. Human evidence
+is required before changing either decision; automated checks do not open the gate.
+P1-02 plan remains in draft PR #4, with no schema/API/UI/grants implemented.
+This update is documentation only; no new local application/security tests claimed.
+Local document validation passes: two pending decision records, 18 unchecked items,
+no checked items, referenced local evidence files exist; `git diff --check` passes.
+
 Latest request authorizes P1-02 subject to verified prerequisites; explicitly says
 not to bypass security acceptance or merge automatically. Fetch confirms unchanged
 main b3517d3 and feature heads 4fd3914/dc7fca3/37dbd7f. Working tree was clean.
