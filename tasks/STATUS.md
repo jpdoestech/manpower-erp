@@ -1,13 +1,41 @@
 # Project Status — Codex Must Maintain
 
 Last updated: 2026-11-04
-Current requested milestone: CR-002A database compatibility (only phase A authorized now)
-Current task status: REVIEW; CR-002A automated gates pass, acceptance pending before B
+Current requested milestone: CR-002B explicitly requested local setup/start slice
+Current task status: IN_PROGRESS; setup/start implementation and tests underway
 Repository inspected: YES; fetched main b3517d3, P0-02 4fd3914, P1-01 dc7fca3; clean before new branch
 Implemented code: existing P0/P1 foundations plus technical account administration/recovery follow-up; no company/finance modules
 Validated requirements: follow-up 5ca0ad3 has 6/6 hosted checks, 92 backend/13 frontend tests, migrations and Docker gates pass
 
-## CR-002A — SQLite / PostgreSQL compatibility
+## CR-002B — Requested setup/start slice
+
+Added setup-local.bat/start-local.bat and scripts/windows/local.py. Setup uses
+existing uv 0.13.7, repository-managed Python 3.13.18, locked dependencies/npm ci,
+SQLite migrations/check and optional hidden-password ordinary-account CLI. Start
+uses fixed local child settings, loopback servers, refuses port collisions, waits
+for readiness before browser opening and stops only owned processes on Enter/
+Ctrl+C/failure. Existing .env, accounts/data and Docker BATs remain unchanged.
+Plan/tests/evidence: CR-002B-local-launchers.md. Docs: LOCAL_WINDOWS_SETUP.md.
+
+Local: all 17 Windows launcher tests pass (84.196s), including 9 native tests with
+actual double setup, populated-account preservation, real HTTP login/me/logout,
+second-launch refusal and owned shutdown/port release; existing 8 Docker-stub
+tests pass. Ruff format/lint and strict mypy pass (33 files); 101 backend unit/
+SQLite tests and 13 frontend tests pass, frontend format/lint/types/build pass,
+actionlint and whitespace checks pass. CI now includes real native Windows smoke
+and lint/type coverage for the helper. Hosted checks pending after push.
+
+No backend/frontend application or migration change. Local PG/Docker execution,
+interactive hidden-password prompts, default browser opening and closing the
+window with X remain unrun in this slice; hosted PG/Docker regression is required.
+Use Enter/Ctrl+C for supported shutdown. No reset/backup/restore or full B claim.
+Formal A/P1-01 security acceptance remains pending; no automatic merge/deployment.
+
+## CR-002A — SQLite / PostgreSQL compatibility (prior phase evidence)
+
+Subsequent request authorizes setup-local.bat/start-local.bat now; narrow B plan:
+CR-002B-local-launchers.md. Existing formal A and P1-01 review decisions remain
+pending. Full B's additional tools are not included in this setup/start request.
 
 Explicit user-requested architectural prerequisite; starts from verified PR #5
 head 19a0ba7, preserving all feature ancestry. Pre-code plan: CR-002.md, ADR-014.

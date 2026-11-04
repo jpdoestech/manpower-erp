@@ -1,5 +1,12 @@
 # Decision Log (ADRs Index)
 
+2026-11-04 subsequent user request explicitly authorizes Docker-free setup/start
+BATs now. Implement only that B slice, stacked on verified A (65246ba), without
+manufacturing formal A/P1-01 acceptance. Keep Docker launchers intact; add
+setup-local.bat/start-local.bat and one standard-library Python helper. Force
+local child configuration, retain .env/data, no default account/admin grants,
+wait for readiness, stop only owned live processes. Full B and C/D/E stay pending.
+
 CR-002A: [ADR-014](../docs/adr/ADR-014-local-sqlite.md) authorizes explicit local
 SQLite compatibility while retaining PostgreSQL production constraints/locking.
 No security/CPA/deployment approval is implied. A requires review before B;
