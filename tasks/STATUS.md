@@ -2,7 +2,7 @@
 
 Last updated: 2026-11-04
 Current requested milestone: CR-002A database compatibility (only phase A authorized now)
-Current task status: IN_PROGRESS; local gates verified, hosted CI/review pending
+Current task status: REVIEW; CR-002A automated gates pass, acceptance pending before B
 Repository inspected: YES; fetched main b3517d3, P0-02 4fd3914, P1-01 dc7fca3; clean before new branch
 Implemented code: existing P0/P1 foundations plus technical account administration/recovery follow-up; no company/finance modules
 Validated requirements: follow-up 5ca0ad3 has 6/6 hosted checks, 92 backend/13 frontend tests, migrations and Docker gates pass
@@ -30,7 +30,16 @@ Ruff format/lint, strict mypy (31 files), frontend format/lint/typecheck/build,
 pip-audit/npm audit (no known vulnerabilities), actionlint, Compose config and
 whitespace checks pass. Native Uvicorn/Vite HTTP smoke with SQLite passes health,
 readiness/bootstrap/page/login/me/CSRF logout. Detailed commands/limits: CR-002.md.
-Hosted CI has not yet been verified for the new implementation.
+Source `1ff2629` in [PR #6](https://github.com/jpdoestech/manpower-erp/pull/6)
+passes all 10 branch/PR checks: Windows launchers/SQLite, backend, frontend,
+Compose. [Push run 41790302931](https://github.com/jpdoestech/manpower-erp/actions/runs/41790302931)
+and [PR run 41790357270](https://github.com/jpdoestech/manpower-erp/actions/runs/41790357270).
+Hosted Linux: 101 Docker-free tests (9.61s), 42 PostgreSQL tests (12.48s), clean
+migration CLI upgrade/repeat/check/downgrade/reinstall/check and audits pass.
+Hosted Windows SQLite: 101 tests, 14.73s. Docker passes auth/health/dependency-down/
+recovery/persistence gates. Local PostgreSQL source public tables and remaining
+generated test DB counts are both zero; test cluster stopped. Repeat native
+SQLite HTTP smoke after final guards exits 0.
 
 Changed files: database/UTC type/identity models/service/security, Alembic env and
 0002/0003/0004, configuration/PG fixture/head tests plus SQLite acceptance tests,
@@ -41,7 +50,8 @@ No business/UI module change. CR-002B/C/D/E NOT STARTED; root BATs still require
 Docker. Supabase TLS configuration is transport-only; live DB roles/poolers and
 Auth/Vercel/transfer are unverified/unimplemented phase gates. No production data
 or deployment. SQLite files are unencrypted; file owners can bypass DDL guards.
-Phase A review/acceptance is required before B; overall CR-002 is not DONE.
+Phase A is REVIEW; human acceptance is required before B, not inferred from CI.
+Overall CR-002 is not DONE. Evidence-only documentation follows verified source.
 
 ## Windows local launchers — separate authorized contributor task
 

@@ -1,6 +1,7 @@
 # ADR-014 — Opt-in local SQLite, PostgreSQL transactional authority
 
 Status: implementation authorized by CR-002; acceptance pending phase A review.
+Automated evidence: implementation 1ff2629, PR #6, all 10 branch/PR checks pass.
 Date: 2026-11-04. No security/CPA or deployment acceptance is inferred.
 
 Keep the modular monolith and PostgreSQL production authority (ADR-001/009).

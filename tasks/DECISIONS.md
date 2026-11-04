@@ -7,6 +7,11 @@ P1-01 human acceptance remains pending. Python 3.13.18 is pinned because the old
 local 3.13.12 bundled SQLite 3.50.4 affected by the upstream WAL-reset advisory;
 require a patched runtime, keep application dependency locks unchanged.
 
+ADR-014 implementation `1ff2629` passes 10/10 branch/PR checks in
+[PR #6](https://github.com/jpdoestech/manpower-erp/pull/6). SQLite and PostgreSQL
+migrations/security regressions pass; this is automated evidence, not phase-A or
+P1-01 human acceptance. Phase A remains REVIEW; B/C/D/E have not started.
+
 Windows contributor tooling (user request, 2026-11-04): keep existing Compose
 runtimes and add setup.bat/run.bat instead of another native installer/service
 manager. Pin local default Docker context/file/project, generate a DB secret only
