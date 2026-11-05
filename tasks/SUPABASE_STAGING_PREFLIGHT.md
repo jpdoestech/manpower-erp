@@ -53,3 +53,30 @@ certificate is not trusted by that CA store. Installed libpq reports 180004.
 No authenticated DB query or migration succeeded. Requested the provider's database
 CA certificate at .local/supabase-ca.crt; never downgrade certificate verification.
 Auth GETs still return HTTP 200. No product code or cloud setting changed.
+
+## Successful certificate-backed connection — 2026-11-05
+
+The saved .local/supabase-ca.crt parses as a CA file. Added an explicit sslrootcert
+path to ignored staging configuration while preserving sslmode=verify-full.
+`backend/.venv/Scripts/python.exe .local/supabase-staging-preflight.py` now exits 0,
+including an expanded catalog-only permissions check. Exact observed results:
+
+- JWKS, Auth health and settings: HTTP 200; one ES256 key; signup still enabled.
+- Database connected with TLS and transaction_read_only=true. Verification of CA
+  and hostname remained enabled. No application records were read.
+- Connected role: superuser=false, bypass_rls=true. Not acceptable as app runtime.
+- All six current ORM auth table names checked: zero present; zero in public.
+- No erp_private schema or Alembic version table found.
+- anon and authenticated roles both have public schema USAGE. Catalog contains
+  32 public default table ACL privilege entries for those roles. This is a count
+  of privilege entries, not tables; effective grants for new objects still depend
+  on their creating role and need explicit testing.
+- Transactions rolled back; no schema, account, grants or Auth settings changed.
+
+Next safe implementation slice: plan/test an ERP-private schema and separate
+runtime/migrator roles against disposable PostgreSQL before hosted migration.
+Do not run current unqualified migrations into public, enable an automatic GitHub
+migration runner, or reuse this privileged connection in a deployed API. Keep
+ADR-017/human Auth acceptance pending. Supabase availability is not ERP cloud login.
+git diff --check and ignored-file checks pass; product regression suites were not
+rerun for documentation/private-configuration-only changes.

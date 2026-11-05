@@ -29,6 +29,17 @@ probes exit 1; the system CA store does not trust the database certificate. Awai
 the provider database CA in .local/supabase-ca.crt. No authenticated DB queries,
 migrations or cloud mutations succeeded; prior empty-URL evidence above is history.
 
+Latest staging result (supersedes connection blockers above): supplied CA parses;
+explicit sslrootcert plus verify-full yields successful read-only TLS connection,
+probe exit 0. No six ERP identity tables, Alembic version table or erp_private
+schema found. Connected role has BYPASSRLS and must not be used by API runtime.
+anon/authenticated have public USAGE and 32 public default table privilege entries
+in total; exact creating-role/effective exposure requires tests before migration.
+No cloud writes or user-data reads. Next: implement/test protected schema and
+separate roles on disposable PG before staging DDL. Auth integration/security
+acceptance still pending. Changed evidence: SUPABASE_STAGING_PREFLIGHT.md,
+docs/SUPABASE_STAGING_SETUP.md and STATUS; private CA/config remain ignored.
+
 Latest CR-002C start-request recheck (2026-11-05): git fetch --all --prune now
 succeeds, but remote main is still b3517d3 and PRs #1–#12 remain open/unmerged;
 #12 is draft at 9efaa48. Fresh reviews AND issue-comment reads for #2/#3/#9/#12

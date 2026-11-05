@@ -86,6 +86,15 @@ process-only system trust-store retry rejects the server certificate. Download
 the database CA from Supabase Database Settings to ignored .local/supabase-ca.crt
 before retrying with an explicit sslrootcert. No certificate bypass is permitted.
 
+Latest result: the supplied CA parses and explicit sslrootcert is now configured
+privately. The read-only probe exits 0 with TLS, CA/hostname verification and
+read-only transactions. No ERP identity tables, Alembic version table or
+erp_private schema were found. The connected role has BYPASSRLS; it is unsuitable
+for API runtime. Both API roles have public schema USAGE, and the catalog contains
+32 default table privilege entries for those roles in public (not a table count).
+Do not migrate unqualified auth tables there. A private schema/role configuration
+and its disposable PostgreSQL tests are the next step; no cloud DDL has run.
+
 No migrations, cloud accounts, settings or data were changed. No SDK was installed.
 The offered @supabase/server package targets JavaScript runtimes; the existing
 FastAPI Python backend remains authoritative. No cloud login is enabled.
