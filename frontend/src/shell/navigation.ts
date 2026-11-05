@@ -1,0 +1,88 @@
+export const modules = [
+  {
+    id: "dashboard",
+    label: "Dashboard",
+    group: "Workspace",
+    icon: "dashboard",
+    description: "Workspace status and available foundations.",
+  },
+  {
+    id: "companies",
+    label: "Company Management",
+    group: "Organization",
+    icon: "building",
+    description: "Independent legal companies and registration profiles.",
+  },
+  {
+    id: "head-offices",
+    label: "Head Offices",
+    group: "Organization",
+    icon: "building",
+    description: "Head offices within their legal company.",
+  },
+  {
+    id: "branches",
+    label: "Branches",
+    group: "Organization",
+    icon: "branch",
+    description: "Operational branches and authorized relationships.",
+  },
+  {
+    id: "clients",
+    label: "Clients",
+    group: "Organization",
+    icon: "users",
+    description: "Legal client identities and branch engagements.",
+  },
+  {
+    id: "contracts",
+    label: "Service Contracts",
+    group: "Organization",
+    icon: "document",
+    description: "Effective-dated contracts and deployment sites.",
+  },
+  {
+    id: "billing",
+    label: "Client Billing Studio",
+    group: "Accounting",
+    icon: "layout",
+    description: "Versioned client billing definitions and approvals.",
+  },
+  {
+    id: "ledger",
+    label: "General Ledger",
+    group: "Accounting",
+    icon: "book",
+    description: "Balanced journals and immutable posting.",
+  },
+  {
+    id: "receivables",
+    label: "Accounts Receivable",
+    group: "Accounting",
+    icon: "document",
+    description: "Receivable balances and aging.",
+  },
+  {
+    id: "collections",
+    label: "Collections",
+    group: "Accounting",
+    icon: "wallet",
+    description: "Controlled receipts and payment allocations.",
+  },
+  {
+    id: "reports",
+    label: "Reports",
+    group: "Insights",
+    icon: "chart",
+    description: "Scoped operational and financial reporting.",
+  },
+  {
+    id: "administration",
+    label: "System Administration",
+    group: "System",
+    icon: "settings",
+    description: "Server-verified technical capabilities required.",
+  },
+] as const;
+
+export type Page = (typeof modules)[number]["id"] | "account" | "reference";

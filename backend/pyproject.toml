@@ -2,7 +2,14 @@
 name = "manpower-api"
 version = "0.1.0"
 requires-python = ">=3.13,<3.14"
-dependencies = ["fastapi", "uvicorn", "psycopg[binary]"]
+dependencies = [
+    "fastapi",
+    "uvicorn",
+    "psycopg[binary]",
+    "sqlalchemy>=2,<3",
+    "alembic>=1,<2",
+    "argon2-cffi>=25.1.0",
+]
 
 [dependency-groups]
 dev = ["pytest", "ruff", "mypy", "pip-audit", "httpx2>=2.16.0"]

@@ -15,19 +15,37 @@ services:
       interval: 5s
       timeout: 5s
       retries: 12
-  api:
+  migrate:
+    image: manpower-erp-api:local
     build:
       context: .
       dockerfile: backend/Dockerfile
-    ports:
-      - "127.0.0.1:8000:8000"
+    environment: &database_environment
+      AUTH_ORIGIN: ${AUTH_ORIGIN:-http://127.0.0.1:5173}
+      AUTH_COOKIE_SECURE: ${AUTH_COOKIE_SECURE:-true}
+      POSTGRES_HOST: db
+      POSTGRES_USER: ${POSTGRES_USER:-manpower}
+      POSTGRES_DB: ${POSTGRES_DB:-manpower}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?Set POSTGRES_PASSWORD in .env}
+    command: [".venv/bin/alembic", "upgrade", "head"]
     depends_on:
       db:
         condition: service_healthy
+  api:
+    image: manpower-erp-api:local
+    build:
+      context: .
+      dockerfile: backend/Dockerfile
+    environment: *database_environment
+    ports:
+      - "127.0.0.1:8000:8000"
+    depends_on:
+      migrate:
+        condition: service_completed_successfully
     healthcheck:
-      test: ["CMD", ".venv/bin/python", "-c", "import urllib.request; urllib.request.urlopen('http://127.0.0.1:8000/api/bootstrap', timeout=3)"]
+      test: ["CMD", ".venv/bin/python", "-c", "import urllib.request; urllib.request.urlopen('http://127.0.0.1:8000/api/health/ready', timeout=8)"]
       interval: 5s
-      timeout: 5s
+      timeout: 10s
       retries: 12
   web:
     build:

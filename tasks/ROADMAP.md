@@ -26,6 +26,44 @@ Status values: TODO, IN_PROGRESS, BLOCKED, REVIEW, DONE. Each task gets a PR/cha
 | P8-01 | Hardening, backups, performance, UAT, deployment | all critical | Signed UAT, restore drill, security review |
 
 ## Task lifecycle
+
+Controlled integration review (2026-11-05) is explicitly authorized before C.
+Release candidate release/rc-2026-11-05 inherits the complete #1–#11 stack at
+2232702. Plan/evidence: [INTEGRATION_READINESS.md](INTEGRATION_READINESS.md);
+owner/security actions: [checklist](../docs/INTEGRATION_REVIEW_CHECKLIST.md).
+Preserve head ancestry, integrate accepted PRs #1 through #11 in order, retarget
+and revalidate each successor; no automatic merge or pending milestone DONE.
+The RC is not acceptance. Both P1-01 human decisions, phase A/B conditions and
+the CR-002C G/C-D prerequisites remain required. No C runtime work starts here.
+
+UI-001 is explicitly authorized as an independent frontend foundation while
+CR-002B acceptance and P1-01 security review remain pending. Plan/evidence:
+[UI-001.md](UI-001.md). Shell/primitives only; no operational hierarchy, scopes,
+accounting logic, Supabase implementation or relaxation of existing phase gates.
+Review UI-001 before operational screens; CR-002C still requires B acceptance
+and authentication review, P1-02 retains its security prerequisites.
+
+CR-002 is an explicitly authorized architectural prerequisite before further ERP
+business modules, independent of the pending P1-01 human acceptance. Execute one
+phase at a time: A database compatibility -> B Windows native tooling -> C real
+local/Supabase Auth -> D Supabase/Vercel deployment configuration -> E transfer
+and self-hosting. Each phase requires separate evidence/acceptance; A acceptance
+gates B. See CR-002.md. This does not unblock P1-02 or rewrite prior acceptance.
+The subsequent explicit B-completion request authorizes all nine local tools;
+tracked in CR-002B-completion.md. CR-002C.md is plan-only until B acceptance.
+
+CR-002C's refreshed technical review includes CR-002C-READINESS.md, proposed
+ADR-017 and AUTH_PROVIDER_STRATEGY.md. Its G1–7 prerequisites/C-D decisions and
+C-A acceptance matrix preserve B acceptance and both P1-01 security reviews.
+Planning completion authorizes no provider implementation or automatic integration.
+Company permission foundations stay deny-all until approved P1-02/P1-03; live
+Vercel roles/poolers/deployment and self-host transfer remain D/E boundaries.
+
+P1-01's authorized CR-001 follow-up covers technical administrator provisioning,
+independent account control and expiring single-use password recovery; plan and
+security acceptance tests: `tasks/P1-01-account-controls.md`. It does not advance
+P1-02/P1-03 or grant company/financial authority. Human security acceptance still
+gates P1-01 completion; feature PRs remain separate and unmerged.
 TODO -> IN_PROGRESS (write task plan/tests) -> REVIEW (tests plus evidence) -> DONE (human acceptance for high-risk changes). BLOCKED includes reason and next action.
 
 ## Priority note

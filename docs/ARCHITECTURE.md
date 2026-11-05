@@ -1,9 +1,37 @@
 # Architecture and Data Governance
 
 ## Recommended stack (subject to ADR confirmation)
+
+P0-02 decisions are documented in `docs/adr/` and indexed in `tasks/DECISIONS.md`.
+SQLAlchemy/Alembic, session lifecycle, health and diagnostic contracts are the
+implemented infrastructure; the domain/security policies below remain design
+requirements until their roadmap slices. See `docs/OPERATIONS.md` for commands.
 React + TypeScript frontend, Python FastAPI backend, PostgreSQL, managed object storage, background task queue, Docker-based local development. Start as a modular monolith with well-defined module boundaries.
 
 ## Modules
+
+UI-001 introduces the independent frontend shell/design system (ADR-016).
+See FRONTEND_ARCHITECTURE.md and UI_UX_DESIGN_SYSTEM.md. No organization schema,
+scopes, financial workflow or authentication provider changes accompany it.
+
+CR-002A / ADR-014 adds opt-in local SQLite with shared ORM/Alembic history,
+UTC-aware timestamps and conservative serialized local identity transactions.
+PostgreSQL remains the production and concurrency authority. Configuration is
+explicit; staging/production SQLite is rejected. See DATABASE_MODES.md and
+SQLITE_POSTGRES_COMPATIBILITY.md. No company/financial schema is introduced.
+Supabase Auth adapters, cloud roles/poolers/Vercel and transfer are C/D/E work.
+CR-002C's AUTH_PROVIDER_STRATEGY.md and proposed ADR-017 describe a protected
+backend session bridge and explicit identity mappings, not implemented support.
+Local auth/SQLite remains intact; provider selection grants no company authority.
+Runtime implementation awaits existing acceptance/security decisions in CR-002C.md.
+CR-002B local lifecycle/recovery follows ADR-015: Windows cooperative ownership,
+SQLite online snapshots and confirmed offline replacement; no production rollback.
+
+P1-02 planning is recorded in `tasks/P1-02.md` and proposed ADR-013. It separates
+legal companies/client identities from dated branch engagements, contracts/sites,
+with company-preserving FKs and explicit bootstrap scope grants. No organization
+schema/API/UI exists yet: P1-01 remains REVIEW pending human security acceptance.
+ADR-013 is not adopted or implemented; no company access or tax treatment is implied.
 identity, organizations, contracts, billing_configuration, billing_execution, payroll_imports, disbursements, approvals, invoicing, general_ledger, receivables, collections, payables, cash_bank, tax, documents, analytics, audit.
 
 ## Data model constraints

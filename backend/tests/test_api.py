@@ -31,5 +31,23 @@ def test_bootstrap_is_read_only() -> None:
 
 def test_openapi_declares_bootstrap_contract() -> None:
     schema = client.get("/openapi.json").json()
-    assert set(schema["paths"]) == {"/api/bootstrap"}
+    assert set(schema["paths"]) == {
+        "/api/bootstrap",
+        "/api/health/live",
+        "/api/health/ready",
+        "/api/auth/login",
+        "/api/auth/me",
+        "/api/auth/logout",
+        "/api/auth/password",
+        "/api/auth/reset-password",
+        "/api/auth/admin/requests",
+        "/api/auth/admin/requests/{change_id}/approve",
+    }
     assert "Bootstrap" in schema["components"]["schemas"]
+    for status in ("422", "503"):
+        response_schema = schema["paths"]["/api/health/ready"]["get"]["responses"][
+            status
+        ]
+        assert response_schema["content"]["application/json"]["schema"]["$ref"] == (
+            "#/components/schemas/ErrorResponse"
+        )

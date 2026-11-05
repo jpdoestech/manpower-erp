@@ -19,6 +19,15 @@ remaining limits. This does not authorize production deployment or production da
 changes. Never include secrets or claim unrun checks passed.
 
 ## Non-negotiable engineering rules
+- CR-002 permits opt-in local/test SQLite only; PostgreSQL remains production
+  authority. Read docs/DATABASE_MODES.md and SQLITE_POSTGRES_COMPATIBILITY.md.
+  Keep actual PostgreSQL regression/concurrency tests; SQLite is no financial
+  concurrency proof. Never bypass pending P1-01 security acceptance or phase gates.
+- Windows local tools: use the nine *-local*.bat commands documented in
+  docs/LOCAL_WINDOWS_SETUP.md. Reset/restore require typed confirmation, offline
+  ownership checks and a recovery snapshot. Never force-stop by stored PID,
+  delete active WAL sidecars, target cloud URLs or run destructive tools against
+  developer data in tests. Backups live in ignored .local-backups; protect them.
 - Company isolation on every company-owned record, query, export, background job and API; deny by default.
 - Branch/client/contract resource scoping; permissions enforced server-side; frontend hiding is insufficient.
 - Separation of duties: creator cannot approve own item, including users holding both roles; authorization rechecked at approval time.
