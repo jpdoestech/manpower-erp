@@ -23,6 +23,12 @@ SUPABASE_STAGING_PREFLIGHT.md and docs/SUPABASE_STAGING_SETUP.md. No human appro
 or completed CR-002C implementation is inferred. Next: privately save the staging
 connection, verify read-only access, then test the protected migration configuration.
 
+Staging follow-up: connection URL is now populated and project-matching; missing
+verify-full was added only to ignored configuration. Both default and system CA
+probes exit 1; the system CA store does not trust the database certificate. Awaiting
+the provider database CA in .local/supabase-ca.crt. No authenticated DB queries,
+migrations or cloud mutations succeeded; prior empty-URL evidence above is history.
+
 Latest CR-002C start-request recheck (2026-11-05): git fetch --all --prune now
 succeeds, but remote main is still b3517d3 and PRs #1–#12 remain open/unmerged;
 #12 is draft at 9efaa48. Fresh reviews AND issue-comment reads for #2/#3/#9/#12

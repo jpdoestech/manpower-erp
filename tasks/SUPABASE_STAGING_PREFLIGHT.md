@@ -43,3 +43,13 @@ docs/SUPABASE_STAGING_SETUP.md for a single-authority migration path and the
 private-schema/Data API/runtime-role safeguards required before hosted migration.
 No package installed and no cloud resource changed. No full regression suite rerun
 for this documentation-only slice; prior RC evidence is explicitly separate.
+
+Follow-up private configuration check (2026-11-05): DATABASE_URL is now populated,
+the project host matches, and the password placeholder is removed. Added the
+missing sslmode=verify-full option to the ignored file without displaying secrets.
+The read-only probe exits 1: default libpq trust requires a CA certificate. A
+process-only retry with PGSSLROOTCERT=system also exits 1, reporting that the server
+certificate is not trusted by that CA store. Installed libpq reports 180004.
+No authenticated DB query or migration succeeded. Requested the provider's database
+CA certificate at .local/supabase-ca.crt; never downgrade certificate verification.
+Auth GETs still return HTTP 200. No product code or cloud setting changed.

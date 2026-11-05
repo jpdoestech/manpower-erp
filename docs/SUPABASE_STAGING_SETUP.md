@@ -79,6 +79,13 @@ Bounded HTTPS GETs using the supplied public project configuration returned:
   established by the returned field; do not infer it is disabled.
 - PostgreSQL: not tested because DATABASE_URL remained empty in the ignored file.
 
+Follow-up: the saved database URL now matches the project and contains an actual
+password value. The missing sslmode=verify-full option was added privately.
+Connectivity is still unverified: default CA configuration is missing; a
+process-only system trust-store retry rejects the server certificate. Download
+the database CA from Supabase Database Settings to ignored .local/supabase-ca.crt
+before retrying with an explicit sslrootcert. No certificate bypass is permitted.
+
 No migrations, cloud accounts, settings or data were changed. No SDK was installed.
 The offered @supabase/server package targets JavaScript runtimes; the existing
 FastAPI Python backend remains authoritative. No cloud login is enabled.
