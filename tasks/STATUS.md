@@ -9,6 +9,20 @@ Validated requirements: UI-001 8c0f50c has 10/10 hosted checks; 110 unit/SQLite,
 
 ## Integration readiness — release/rc-2026-11-05
 
+Staging preparation (2026-11-05): user explicitly authorized development/staging
+database/Auth-first work and reports a Supabase GitHub connection. Separate branch
+chore/supabase-staging-preflight adds the plan and staging guide; local ignored
+configuration leaves Windows SQLite/local auth untouched. Read-only JWKS, Auth
+health and settings GETs return HTTP 200; one ES256 key; public signup enabled.
+DATABASE_URL remains empty, so PostgreSQL/TLS/grants/migrations are NOT TESTED.
+No schema, account, provider setting, dependency or production resource changed.
+The dashboard automation configuration is unverified. Alembic stays the sole ERP
+migration authority; private schema/Data API exposure and runtime/migrator roles
+must be proven before hosted ERP migration. Details and exact command/exit status:
+SUPABASE_STAGING_PREFLIGHT.md and docs/SUPABASE_STAGING_SETUP.md. No human approval
+or completed CR-002C implementation is inferred. Next: privately save the staging
+connection, verify read-only access, then test the protected migration configuration.
+
 Latest CR-002C start-request recheck (2026-11-05): git fetch --all --prune now
 succeeds, but remote main is still b3517d3 and PRs #1–#12 remain open/unmerged;
 #12 is draft at 9efaa48. Fresh reviews AND issue-comment reads for #2/#3/#9/#12
