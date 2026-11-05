@@ -1,11 +1,49 @@
 # Project Status — Codex Must Maintain
 
-Last updated: 2026-11-04
-Current requested milestone: CR-002C technical preparation and acceptance audit only
-Current task status: PLAN READY FOR REVIEW; provider implementation NOT STARTED, existing acceptance gates pending
-Repository inspected: YES; fetched main b3517d3, P0-02 4fd3914, P1-01 dc7fca3; clean before new branch
+Last updated: 2026-11-05
+Current requested milestone: controlled integration readiness and local foundation RC
+Current task status: REVIEW; local regression gates pass, fresh RC CI required, human acceptance pending, CR-002C NOT STARTED
+Repository inspected: YES; connector verifies all original remote heads including main b3517d3; CLI fetch fails; RC starts at 2232702
 Implemented code: existing P0/P1 foundations plus technical account administration/recovery follow-up; no company/finance modules
 Validated requirements: UI-001 8c0f50c has 10/10 hosted checks; 110 unit/SQLite, 42 PG, 27 frontend, 27 browser and 30 Windows safety tests pass
+
+## Integration readiness — release/rc-2026-11-05
+
+RC branch starts at 2232702 and includes the complete implemented stack without
+merging or rewriting any original PR. Main remains b3517d3. All PRs #1–#11 are
+open/unmerged (#4/#11 draft), zero submitted reviews/threads, current-base
+mergeability true. All head-matching checks pass (6/6 for #1–#4, 8/8 for #5,
+10/10 for #6–#11). Proved exact base/head ancestry, 25 disjoint incremental commits
+and no duplicate stable patch IDs. Recommended history-preserving order: #1 ->
+#2 -> #3 -> #4 -> #5 -> #6 -> #7 -> #8 -> #9 -> #10 -> #11, retarget/recheck after
+each accepted predecessor. RC is validation, not a security-review bypass.
+
+CLI fetch repeatedly failed on GitHub port 443. The connector independently lists
+all 12 original remote branches and confirms every PR/main head against local
+refs; failed fetches are not represented as success. RC branch was published via
+the authorized GitHub connector; no other branch was changed.
+
+Local fresh evidence: test-local.bat exits 0 (110 backend/SQLite/auth tests,
+launcher/database safety with opt-in smoke skipped, 27 frontend); 42 actual PG
+tests and migration CLI up/repeat/check/down/up/check pass on a new loopback test
+cluster, now stopped; 27 responsive browser checks pass across nine profiles;
+format/lint/types/build/lock checks/audits/Compose config/actionlint pass.
+Real fresh Windows nine-tool workflow also passes separately (one test, 447.604s,
+no skip): setup twice, HTTP login/me/CSRF logout, readiness, check, live backup,
+repeated stop, restore/reset/restore, repeated migrations and test-local. Ports
+were free before/after this fixture; original workspace DB untouched. New RC
+hosted PostgreSQL/Compose/Windows/frontend CI must pass at the candidate head;
+current evidence is recorded with the candidate PR. No runtime or schema change.
+
+Evidence/conditions: INTEGRATION_READINESS.md. Human actions:
+docs/INTEGRATION_REVIEW_CHECKLIST.md. Source security record unchanged: all eighteen
+A/B items and both #2/#3 decisions remain PENDING HUMAN REVIEW. A/B/UI acceptance,
+MFA/recovery/operator/production decisions remain pending; no milestones DONE.
+CR-002C still needs B/inherited acceptance, both P1-01 decisions/conditions,
+accepted ancestry and ADR-017 provider custody/revocation/linking/admin decisions,
+authorized disposable project/test configuration and actual start authorization.
+No main merge, production data change/deployment or Supabase code. Changed files:
+INTEGRATION_READINESS.md, INTEGRATION_REVIEW_CHECKLIST.md, STATUS and ROADMAP.
 
 ## CR-002C — Technical plan only; prerequisites not accepted
 

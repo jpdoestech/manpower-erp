@@ -27,6 +27,15 @@ Status values: TODO, IN_PROGRESS, BLOCKED, REVIEW, DONE. Each task gets a PR/cha
 
 ## Task lifecycle
 
+Controlled integration review (2026-11-05) is explicitly authorized before C.
+Release candidate release/rc-2026-11-05 inherits the complete #1–#11 stack at
+2232702. Plan/evidence: [INTEGRATION_READINESS.md](INTEGRATION_READINESS.md);
+owner/security actions: [checklist](../docs/INTEGRATION_REVIEW_CHECKLIST.md).
+Preserve head ancestry, integrate accepted PRs #1 through #11 in order, retarget
+and revalidate each successor; no automatic merge or pending milestone DONE.
+The RC is not acceptance. Both P1-01 human decisions, phase A/B conditions and
+the CR-002C G/C-D prerequisites remain required. No C runtime work starts here.
+
 UI-001 is explicitly authorized as an independent frontend foundation while
 CR-002B acceptance and P1-01 security review remain pending. Plan/evidence:
 [UI-001.md](UI-001.md). Shell/primitives only; no operational hierarchy, scopes,
