@@ -35,6 +35,13 @@ were free before/after this fixture; original workspace DB untouched. New RC
 hosted PostgreSQL/Compose/Windows/frontend CI must pass at the candidate head;
 current evidence is recorded with the candidate PR. No runtime or schema change.
 
+Candidate is draft [PR #12](https://github.com/jpdoestech/manpower-erp/pull/12).
+Additional integration hold: remote main metadata reports protected=false, no
+rulesets are returned, and detailed protection read is 403 for the connector.
+Owner must verify/enforce required reviews/checks and bypass policy before landing;
+no protection configuration was changed. Exact current-head CI evidence stays
+attached to the candidate PR; no earlier PR's checks substitute for it.
+
 Evidence/conditions: INTEGRATION_READINESS.md. Human actions:
 docs/INTEGRATION_REVIEW_CHECKLIST.md. Source security record unchanged: all eighteen
 A/B items and both #2/#3 decisions remain PENDING HUMAN REVIEW. A/B/UI acceptance,

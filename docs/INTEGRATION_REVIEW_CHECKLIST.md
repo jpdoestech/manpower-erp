@@ -7,6 +7,12 @@ Authoritative separate security records: [P1-01 acceptance](../tasks/SECURITY_AC
 
 ## Owner: integration preparation
 
+- [ ] Verify/enforce main branch protection before integration. At audit time the
+  branch API reports protected=false, the ruleset list is empty, and the detailed
+  protection read is 403 for this connector. Establish required independent reviews,
+  current CI checks and the intended bypass policy in owner settings; this review
+  does not modify or certify those settings.
+
 - [ ] Identify the exact RC SHA and review its complete diff against current main.
   Confirm P0/P1 identity, SQLite tools and UI only; proposed organization/Supabase
   documents grant no runtime permission and contain no implemented business schema.

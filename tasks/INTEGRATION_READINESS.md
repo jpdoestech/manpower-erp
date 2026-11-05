@@ -179,6 +179,17 @@ recovery are unverified. Native backups stay trusted local/current-revision and
 unencrypted. Git transport failures and local Docker availability remain visible;
 passing CI does not invent a successful local run or human decision.
 
+### Repository enforcement finding
+
+Fresh GitHub branch metadata confirms main still at b3517d3 and reports
+`protected: false`. The repository ruleset collection (including parents) is empty.
+The detailed main protection endpoint returns HTTP 403, resource not accessible
+by integration. Do not infer hidden administrative settings from that failed read.
+Owner action: verify actual branch settings and establish required independent
+reviews, current CI checks and the intended no-bypass integration policy before
+landing this stack. This agent changes no repository protection settings.
+The draft candidate is [PR #12](https://github.com/jpdoestech/manpower-erp/pull/12).
+
 ## Final local candidate verification / publication boundary
 
 `ERP_NATIVE_SMOKE=1 uv run --locked python -m unittest discover -s ../scripts/tests
