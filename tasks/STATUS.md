@@ -9,6 +9,21 @@ Validated requirements: UI-001 8c0f50c has 10/10 hosted checks; 110 unit/SQLite,
 
 ## Integration readiness — release/rc-2026-11-05
 
+Latest CR-002C start-request recheck (2026-11-05): git fetch --all --prune now
+succeeds, but remote main is still b3517d3 and PRs #1–#12 remain open/unmerged;
+#12 is draft at 9efaa48. Fresh reviews AND issue-comment reads for #2/#3/#9/#12
+are empty. Both P1-01 records retain PENDING HUMAN REVIEW and all eighteen items
+unchecked; CR-002B acceptance is not recorded. main protected=false and ruleset
+list empty persist; detailed protection read is still 403. ADR-017 remains
+PROPOSED ONLY, with no supplied security decision/approver/reference. The new
+conditional execution request is not evidence that those decisions were made.
+
+At 9efaa48 the RC retains 10/10 passing CI checks. Runtime, dependencies, database
+and human acceptance records are unchanged; no new SQLite/PG execution is claimed
+for this gate-only recheck. CR-002C remains NOT STARTED, including dependency
+installation/contract adoption. Owner/security actions in the integration
+checklist must be completed and verified before the first approved slice starts.
+
 RC branch starts at 2232702 and includes the complete implemented stack without
 merging or rewriting any original PR. Main remains b3517d3. All PRs #1–#11 are
 open/unmerged (#4/#11 draft), zero submitted reviews/threads, current-base
