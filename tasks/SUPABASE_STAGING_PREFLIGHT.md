@@ -133,3 +133,20 @@ for PRs #2, #3, #9 and #12, and both P1-01 security decisions remain pending in
 the repository. The local result is ready for review in PR #13. Hosted DDL and
 live Data API checks are still pending the accepted identity foundation and CR-002
 hosting review. No cloud roles, schemas, data or settings were changed.
+
+### Review follow-up — 2026-11-09
+
+Before editing the verification SQL, add a regression case on the disposable
+cluster. Transfer an identity table to the runtime role inside a transaction.
+The verification must reject it and pass again after rollback. PostgreSQL object
+ownership gives DDL authority even without a CREATE grant on the schema.
+
+On PostgreSQL 18.3, `backend/.venv/Scripts/python.exe
+.local/private-schema-ownership-check.py reproduce` demonstrated that the old
+check passed after transferring `auth_users` and successfully altering it as
+`erp_runtime`. After requiring migrator ownership of the schema, relations and
+routines, the same test in `deny` mode rejected the table and the baseline
+verification passed after rollback. Both test invocations exited 0. The test
+cluster was stopped and `git diff --check` passed. No application code changed.
+PRs #2 and #3 still have no submitted reviews. The technical finding and fix
+provide staging review evidence and leave both independent decisions pending.

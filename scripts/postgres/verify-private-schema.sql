@@ -1,5 +1,17 @@
 DO $$
 BEGIN
+    -- Ownership confers DDL authority independently of schema CREATE grants.
+    IF EXISTS (SELECT 1 FROM pg_namespace
+               WHERE nspname = 'erp_private' AND nspowner <> 'erp_migrator'::regrole)
+        OR EXISTS (SELECT 1 FROM pg_class
+                   WHERE relnamespace = 'erp_private'::regnamespace
+                     AND relowner <> 'erp_migrator'::regrole)
+        OR EXISTS (SELECT 1 FROM pg_proc
+                   WHERE pronamespace = 'erp_private'::regnamespace
+                     AND proowner <> 'erp_migrator'::regrole) THEN
+        RAISE EXCEPTION 'ERP schema, relations and routines must be owned by erp_migrator';
+    END IF;
+
     IF NOT has_schema_privilege('erp_runtime', 'erp_private', 'USAGE')
         OR has_schema_privilege('erp_runtime', 'erp_private', 'CREATE')
         OR has_schema_privilege('erp_runtime', 'public', 'CREATE')

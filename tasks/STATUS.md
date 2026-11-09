@@ -50,6 +50,11 @@ and #2/#3/#9/#12 have no submitted reviews. Hosted schema/roles are unchanged.
 Next step is acceptance of the inherited identity foundation and review of the
 staging runbook before applying it. CR-002C provider implementation remains gated.
 
+Review follow-up on PR #13: verification now checks migrator ownership of private
+schema objects. A disposable PostgreSQL test reproduced runtime ALTER TABLE
+authority under the previous check and verified rejection after the fix. The
+baseline passed after rollback. Both P1-01 human decisions remain pending.
+
 Latest CR-002C start-request recheck (2026-11-05): git fetch --all --prune now
 succeeds, but remote main is still b3517d3 and PRs #1–#12 remain open/unmerged;
 #12 is draft at 9efaa48. Fresh reviews AND issue-comment reads for #2/#3/#9/#12
