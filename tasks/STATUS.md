@@ -9,6 +9,52 @@ Validated requirements: UI-001 8c0f50c has 10/10 hosted checks; 110 unit/SQLite,
 
 ## Integration readiness — release/rc-2026-11-05
 
+Staging preparation (2026-11-05): user explicitly authorized development/staging
+database/Auth-first work and reports a Supabase GitHub connection. Separate branch
+chore/supabase-staging-preflight adds the plan and staging guide; local ignored
+configuration leaves Windows SQLite/local auth untouched. Read-only JWKS, Auth
+health and settings GETs return HTTP 200; one ES256 key; public signup enabled.
+DATABASE_URL remains empty, so PostgreSQL/TLS/grants/migrations are NOT TESTED.
+No schema, account, provider setting, dependency or production resource changed.
+The dashboard automation configuration is unverified. Alembic stays the sole ERP
+migration authority; private schema/Data API exposure and runtime/migrator roles
+must be proven before hosted ERP migration. Details and exact command/exit status:
+SUPABASE_STAGING_PREFLIGHT.md and docs/SUPABASE_STAGING_SETUP.md. No human approval
+or completed CR-002C implementation is inferred. Next: privately save the staging
+connection, verify read-only access, then test the protected migration configuration.
+
+Staging follow-up: connection URL is now populated and project-matching; missing
+verify-full was added only to ignored configuration. Both default and system CA
+probes exit 1; the system CA store does not trust the database certificate. Awaiting
+the provider database CA in .local/supabase-ca.crt. No authenticated DB queries,
+migrations or cloud mutations succeeded; prior empty-URL evidence above is history.
+
+Latest staging result (supersedes connection blockers above): supplied CA parses;
+explicit sslrootcert plus verify-full yields successful read-only TLS connection,
+probe exit 0. No six ERP identity tables, Alembic version table or erp_private
+schema found. Connected role has BYPASSRLS and must not be used by API runtime.
+anon/authenticated have public USAGE and 32 public default table privilege entries
+in total; exact creating-role/effective exposure requires tests before migration.
+No cloud writes or user-data reads. Next: implement/test protected schema and
+separate roles on disposable PG before staging DDL. Auth integration/security
+acceptance still pending. Changed evidence: SUPABASE_STAGING_PREFLIGHT.md,
+docs/SUPABASE_STAGING_SETUP.md and STATUS; private CA/config remain ignored.
+
+2026-11-09 private schema rehearsal in PR #13: added prepare, grant and verification
+SQL under `scripts/postgres/` and the staging runbook. On disposable PostgreSQL
+18.3, migration/retry/drift checks, empty reinstall, populated downgrade denial,
+restricted-role API login/logout and API-role denial passed. SQLite/backend
+110 passed, PostgreSQL 42 passed, Ruff and mypy passed. Exact commands and
+expected denials are in `SUPABASE_STAGING_PREFLIGHT.md`. Main remains `b3517d3`
+and #2/#3/#9/#12 have no submitted reviews. Hosted schema/roles are unchanged.
+Next step is acceptance of the inherited identity foundation and review of the
+staging runbook before applying it. CR-002C provider implementation remains gated.
+
+Review follow-up on PR #13: verification now checks migrator ownership of private
+schema objects. A disposable PostgreSQL test reproduced runtime ALTER TABLE
+authority under the previous check and verified rejection after the fix. The
+baseline passed after rollback. Both P1-01 human decisions remain pending.
+
 Latest CR-002C start-request recheck (2026-11-05): git fetch --all --prune now
 succeeds, but remote main is still b3517d3 and PRs #1–#12 remain open/unmerged;
 #12 is draft at 9efaa48. Fresh reviews AND issue-comment reads for #2/#3/#9/#12
