@@ -69,6 +69,50 @@ and drop databases and require a dedicated disposable server.
    provider adapter. Provider availability and valid JWKS do not prove JWT claim
    validation, ERP mapping, refresh rotation or immediate session revocation.
 
+## Private schema rehearsal and staging runbook
+
+The SQL under `scripts/postgres/` was rehearsed on isolated PostgreSQL 18.3.
+Hosted execution waits for the accepted identity foundation and hosting review.
+Confirm the staging project and recovery point, exclude `erp_private` from Data
+API exposed schemas, and schedule one migration operator. Use a direct database
+connection and keep `verify-full` with the staging CA. Keep separate credentials
+for the provisioning operator, `erp_migrator`, and `erp_runtime`.
+
+1. Provision `erp_migrator` and `erp_runtime` as dedicated LOGIN roles with no
+   memberships, superuser, role/database creation, replication, or BYPASSRLS.
+   Set credentials through a private operator channel. The SQL expects the
+   Supabase roles `anon`, `authenticated`, and `service_role` to exist.
+2. As the provisioning operator, from the repository root, run
+   `psql -X -v ON_ERROR_STOP=1 -f scripts/postgres/prepare-private-schema.sql`.
+   Supply connection settings through the operator's private environment. This
+   transaction creates the schema, sets database-specific role search paths,
+   and rejects unsafe roles, unexpected ownership, or ERP tables outside it.
+3. Open a fresh migrator connection. Verify `SELECT current_user, current_schema()`
+   returns `erp_migrator, erp_private`. From `backend` with the migrator's private
+   `DATABASE_URL` and `DATABASE_MODE=supabase`, run `uv run --locked alembic upgrade head`
+   followed by `uv run --locked alembic check`. Use the reviewed revision only.
+   The role's search path puts both ERP tables and Alembic history in the private
+   schema without rewriting migrations or changing SQLite.
+4. From the root, as `erp_migrator`, run
+   `psql -X -v ON_ERROR_STOP=1 -f scripts/postgres/grant-private-runtime.sql` and
+   `psql -X -v ON_ERROR_STOP=1 -f scripts/postgres/verify-private-schema.sql`.
+   Grants are pinned to the tested revision. Review them for each schema change.
+   Runtime gets the necessary identity operations, append-only audit access
+   with the `created_at` return column, and no access to Alembic history.
+5. Reconnect as `erp_runtime` and check the current role/schema. Check readiness,
+   login, session lookup, CSRF logout, and rejection of the old session using a
+   synthetic account. Verify denied reads as the Data API roles and denied DDL
+   as the runtime. Point FastAPI only at the runtime connection after those checks.
+
+If any step fails, keep the API disconnected from the staging database. Compare
+the Alembic revision and catalog privileges before retrying. Each SQL script
+that writes is transactional, and repeat setup/grant and repeat upgrade were
+rehearsed. Empty downgrade/reinstall was tested locally only. Preserve populated
+identity and audit history and use the reviewed recovery point for recovery.
+
+References for the security boundary include the [PostgreSQL schema search path](https://www.postgresql.org/docs/current/ddl-schemas.html)
+and [Supabase Data API security](https://supabase.com/docs/guides/api/securing-your-api).
+
 ## Verified preflight — 2026-11-05
 
 Bounded HTTPS GETs using the supplied public project configuration returned:

@@ -80,3 +80,56 @@ migration runner, or reuse this privileged connection in a deployed API. Keep
 ADR-017/human Auth acceptance pending. Supabase availability is not ERP cloud login.
 git diff --check and ignored-file checks pass; product regression suites were not
 rerun for documentation/private-configuration-only changes.
+
+## Private schema rehearsal plan — 2026-11-09
+
+The user authorized the migration rehearsal and subsequent staging application
+subject to the release gates. Work in PR #13. Add operator SQL under
+`scripts/postgres/` and document commands in the staging guide. Use an isolated
+loopback PostgreSQL cluster with synthetic credentials and Supabase-style API
+roles. Existing Alembic revisions and runtime code stay unchanged.
+
+1. Provision `erp_private` for a dedicated non-superuser migrator and a separate
+   non-owner runtime. Set the database-specific search path for both. Refuse an
+   unsafe role or conflicting starting state before any migration.
+2. Verify clean install, repeat upgrade, drift check, and empty downgrade/reinstall.
+   Verify existing audit and identity history blocks destructive downgrade.
+3. Grant runtime access only to the existing identity operations. Prove real API
+   login/logout, append-only audit, denial of runtime DDL and schema history writes,
+   and denial of ERP reads for both API roles even with Supabase-style public
+   defaults. Run backend lint, types and both SQLite and PostgreSQL suites.
+4. Run the rehearsal from the committed inputs, record exact results and push the
+   review. Stop before hosted DDL if the accepted foundation or hosting gates are
+   still pending. No stage of this rehearsal provisions Supabase Auth or users.
+
+## Private schema rehearsal results — 2026-11-09
+
+Executed all three `scripts/postgres/` SQL files using psycopg on a new isolated
+PostgreSQL 18.3 cluster bound to loopback. The local Python rehearsal checked the
+server data directory before setup. No hosted credentials were loaded.
+
+- Setup rejected a runtime role with BYPASSRLS and a pre-existing public identity
+  table. Both failures rolled back. Repeated setup and repeated grants succeeded.
+- Alembic as `erp_migrator`: `upgrade head` twice, `check`, `downgrade base`,
+  `upgrade head`, `check` all passed. Identity tables and Alembic history stayed in
+  `erp_private`. A populated downgrade failed as intended. The identity, audit
+  rows and current revision survived, and the final drift check passed.
+- Verified denied identity reads as `anon`, `authenticated`, and `service_role`.
+  Runtime DDL, Alembic reads/writes, audit reads and audit truncation were denied.
+  FastAPI using the restricted role provisioned a synthetic account and returned
+  readiness 200, login 200, session lookup 200, CSRF logout 204, and session lookup
+  401 after logout. This exercised the local auth provider against private PG.
+- From `backend`: `.venv/Scripts/pytest.exe -q -m 'not integration'` returned
+  110 passed, 42 deselected in 19.41s. With the loopback disposable PostgreSQL
+  URL, `.venv/Scripts/pytest.exe -q -m integration` returned 42 passed,
+  110 deselected in 57.72s.
+- From `backend`: `.venv/Scripts/ruff.exe format --config pyproject.toml --check . ../scripts`
+  reported 37 formatted files. `.venv/Scripts/ruff.exe check --config pyproject.toml . ../scripts`
+  passed. `.venv/Scripts/mypy.exe app tests alembic ../scripts` reported no issues
+  in 37 source files. `git diff --check` passed.
+
+Fresh fetch still finds main at `b3517d3`. GitHub returned zero submitted reviews
+for PRs #2, #3, #9 and #12, and both P1-01 security decisions remain pending in
+the repository. The local result is ready for review in PR #13. Hosted DDL and
+live Data API checks are still pending the accepted identity foundation and CR-002
+hosting review. No cloud roles, schemas, data or settings were changed.

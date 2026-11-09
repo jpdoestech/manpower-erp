@@ -40,6 +40,16 @@ separate roles on disposable PG before staging DDL. Auth integration/security
 acceptance still pending. Changed evidence: SUPABASE_STAGING_PREFLIGHT.md,
 docs/SUPABASE_STAGING_SETUP.md and STATUS; private CA/config remain ignored.
 
+2026-11-09 private schema rehearsal in PR #13: added prepare, grant and verification
+SQL under `scripts/postgres/` and the staging runbook. On disposable PostgreSQL
+18.3, migration/retry/drift checks, empty reinstall, populated downgrade denial,
+restricted-role API login/logout and API-role denial passed. SQLite/backend
+110 passed, PostgreSQL 42 passed, Ruff and mypy passed. Exact commands and
+expected denials are in `SUPABASE_STAGING_PREFLIGHT.md`. Main remains `b3517d3`
+and #2/#3/#9/#12 have no submitted reviews. Hosted schema/roles are unchanged.
+Next step is acceptance of the inherited identity foundation and review of the
+staging runbook before applying it. CR-002C provider implementation remains gated.
+
 Latest CR-002C start-request recheck (2026-11-05): git fetch --all --prune now
 succeeds, but remote main is still b3517d3 and PRs #1–#12 remain open/unmerged;
 #12 is draft at 9efaa48. Fresh reviews AND issue-comment reads for #2/#3/#9/#12
