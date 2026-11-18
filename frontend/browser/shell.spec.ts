@@ -2,7 +2,11 @@ import AxeBuilder from "@axe-core/playwright";
 import { expect, type Page, test } from "@playwright/test";
 
 // Synthetic API fixtures are confined to this test; runtime has no mock auth path.
-async function api(page: Page, signedIn: boolean) {
+async function api(
+  page: Page,
+  signedIn: boolean,
+  companyName = "Synthetic Test Company",
+) {
   await page.route("**/api/**", (route) => {
     const path = new URL(route.request().url()).pathname;
     if (path === "/api/bootstrap")
@@ -23,12 +27,37 @@ async function api(page: Page, signedIn: boolean) {
           {
             id: "browser-company",
             code: "DEMO",
-            legal_name: "Synthetic Test Company",
+            legal_name: companyName,
             is_active: true,
             version: 1,
           },
         ],
       });
+    if (signedIn && path.startsWith("/api/companies/browser-company/")) {
+      const branch = path.endsWith("/branches");
+      const unit = {
+        id: branch ? "browser-branch" : "browser-office",
+        company_id: "browser-company",
+        code: branch ? "BR" : "HO",
+        name: branch ? "Synthetic Branch" : "Synthetic Head Office",
+        valid_from: "2020-01-01",
+        valid_to: null,
+        is_active: true,
+        version: 1,
+        ...(branch
+          ? {
+              head_office_id: "browser-office",
+              head_office_name: "Synthetic Head Office",
+            }
+          : {}),
+      };
+      if (route.request().method() === "POST")
+        return route.fulfill({
+          status: 201,
+          json: { ...unit, ...route.request().postDataJSON() },
+        });
+      return route.fulfill({ json: [unit] });
+    }
     return route.fulfill({ status: 401, json: {} });
   });
 }
@@ -44,6 +73,66 @@ async function accessible(page: Page) {
     .withTags(["wcag2a", "wcag2aa", "wcag21a", "wcag21aa"])
     .analyze();
   expect(results.violations).toEqual([]);
+}
+
+for (const kind of ["head office", "branch"] as const) {
+  test(`${kind} hierarchy create form fits every viewport`, async ({
+    page,
+  }, testInfo) => {
+    await api(page, true, `Company${"x".repeat(190)}`);
+    await page.goto("/");
+    await expect(
+      page.getByRole("heading", { name: "Workspace overview" }),
+    ).toBeVisible();
+    const title = kind === "branch" ? "Branches" : "Head Offices";
+    if ((page.viewportSize()?.width ?? 0) <= 600) {
+      await page.getByRole("button", { name: "Open navigation" }).click();
+      await page
+        .getByRole("dialog")
+        .getByRole("button", { name: new RegExp(title) })
+        .click();
+    } else {
+      await page
+        .getByRole("navigation", { name: "Primary navigation" })
+        .getByRole("button", { name: title })
+        .click();
+    }
+    await expect(page.getByLabel("Company", { exact: true })).toBeEnabled();
+    await page
+      .getByLabel("Company", { exact: true })
+      .selectOption("browser-company");
+    await expect(
+      page.getByRole("button", { name: `Add ${kind}` }),
+    ).toBeEnabled();
+    await accessible(page);
+    await noOverflow(page);
+    await page.getByRole("button", { name: `Add ${kind}` }).click();
+    const dialog = page.getByRole("dialog", { name: `Add ${kind}` });
+    if (kind === "branch") {
+      await expect(
+        dialog.getByLabel("Head office", { exact: true }),
+      ).toBeEnabled();
+      await dialog
+        .getByLabel("Head office", { exact: true })
+        .selectOption("browser-office");
+    }
+    await dialog.getByLabel("Code", { exact: true }).fill("NEW");
+    await dialog.getByLabel("Name", { exact: true }).fill(`New ${kind}`);
+    await dialog.getByLabel("Effective from").fill("2020-01-01");
+    await accessible(page);
+    await noOverflow(page);
+    await page.screenshot({
+      path: testInfo.outputPath(`hierarchy-${kind.replace(" ", "-")}.png`),
+      fullPage: false,
+    });
+    await dialog.getByRole("button", { name: `Save ${kind}` }).click();
+    await expect(
+      page.getByText(
+        kind === "branch" ? "Branch saved." : "Head office saved.",
+      ),
+    ).toBeVisible();
+    await expect(dialog).toHaveCount(0);
+  });
 }
 
 test("company registry and edit dialog fit all devices", async ({

@@ -7,7 +7,7 @@ from sqlalchemy.exc import SQLAlchemyError
 from sqlalchemy.orm import Session
 
 from app.database import create_database_engine
-from app.organizations.service import provision_company, set_grant
+from app.organizations.service import provision_company, set_grant, set_hierarchy_grant
 
 
 def main() -> None:
@@ -17,7 +17,7 @@ def main() -> None:
     create.add_argument("code")
     create.add_argument("legal_name")
     create.add_argument("username")
-    for name in ("grant", "revoke"):
+    for name in ("grant", "revoke", "grant-hierarchy", "revoke-hierarchy"):
         command = commands.add_parser(name)
         command.add_argument("company_id", type=UUID)
         command.add_argument("username")
@@ -30,6 +30,14 @@ def main() -> None:
                     db, args.code, args.legal_name, args.username
                 )
                 print(f"Company created: {company.id}")
+            elif args.command in ("grant-hierarchy", "revoke-hierarchy"):
+                set_hierarchy_grant(
+                    db,
+                    args.company_id,
+                    args.username,
+                    args.command == "grant-hierarchy",
+                )
+                print("Company hierarchy access updated.")
             else:
                 set_grant(db, args.company_id, args.username, args.command == "grant")
                 print("Company registry access updated.")

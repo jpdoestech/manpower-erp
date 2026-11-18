@@ -41,11 +41,14 @@ def list_companies(
     q: Annotated[str, Query(max_length=100)] = "",
     offset: Annotated[int, Query(ge=0, le=10000)] = 0,
     active: bool | None = None,
+    hierarchy: bool = False,
 ) -> list[Company]:
     service.set_actor(db, current.user.id)
     response.headers["Cache-Control"] = "no-store"
     query = select(Company).where(
-        Company.id.in_(service.authorized_company_ids(current.user.id))
+        Company.id.in_(
+            service.authorized_company_ids(current.user.id, hierarchy=hierarchy)
+        )
     )
     if q.strip():
         query = query.where(

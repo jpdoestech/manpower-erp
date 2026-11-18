@@ -1584,3 +1584,40 @@ dialog::backdrop {
     width: 100%;
   }
 }
+
+.hierarchy-picker {
+  max-width: 620px;
+  display: grid;
+  gap: 8px;
+}
+.hierarchy-picker-search {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: 10px;
+  align-items: end;
+}
+.hierarchy-picker-pages {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+}
+.hierarchy-context {
+  padding: 12px 0;
+  overflow-wrap: anywhere;
+}
+.hierarchy-dates {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 12px;
+}
+@media (max-width: 600px) {
+  .hierarchy-dates {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
+
+.company-list p,
+.company-edit p {
+  overflow-wrap: anywhere;
+}

@@ -332,6 +332,9 @@ def test_current_head_and_safe_empty_downgrade(migrated: Config) -> None:
             "org_companies",
             "org_company_grants",
             "org_company_events",
+            "org_head_offices",
+            "org_branches",
+            "org_hierarchy_events",
         }
         command.upgrade(migrated, "head")
         command.check(migrated)

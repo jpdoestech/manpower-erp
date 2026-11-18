@@ -27,6 +27,11 @@ Status values: TODO, IN_PROGRESS, BLOCKED, REVIEW, DONE. Each task gets a PR/cha
 
 ## Task lifecycle
 
+The next authorized P1-02 development slice implements head offices and branches
+on top of the company registry. Explicit hierarchy grants, composite company FKs,
+effective-period validation and protected UI/API are required. Clients and
+contracts/sites follow as separate slices. Overall P1-02 remains IN_PROGRESS.
+
 2026-11-18 user direction explicitly permits continued isolated development while
 human review is deferred. P1-02 begins with the company registry slice described
 in P1-02.md. Acceptance, merge and deployment decisions remain separate and pending.

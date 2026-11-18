@@ -1,11 +1,29 @@
 # Project Status — Codex Must Maintain
 
 Last updated: 2026-11-18
-Current requested milestone: P1-02 company registry development slice
+Current requested milestone: P1-02 head offices and branches development slice
 Current task status: IN_PROGRESS; implementation tested, dependency audit finding open, human acceptance pending
 Repository inspected: YES; connector verifies all original remote heads including main b3517d3; CLI fetch fails; RC starts at 2232702
-Implemented code: existing foundations plus company registry, explicit company grants and scoped UI; remaining hierarchy and finance modules outstanding
+Implemented code: company registry, explicit hierarchy grants, head offices/branches and protected UI; clients/contracts/sites and finance modules outstanding
 Validated requirements: implementation aa19dee has passing backend 114/PG 47, frontend 30/browser 36 and Windows 30 tests; frontend CI fails dependency audit
+
+## P1-02 head offices and branches — 2026-11-18
+
+Head-office/branch follow-up: separate development branch from 012c56b adds
+revision 0006 with company-preserving FKs, immutable hierarchy events and a
+false-by-default manage_hierarchy capability. Existing grants gain no new access.
+Operator CLI grant-hierarchy/revoke-hierarchy controls it with audit. Registry
+revocation and restore clear it. API and RLS require the active grant and
+capability. Company locks serialize closure/child creation. Identity/parent/start
+dates stay fixed and edits are versioned. UI adds scoped selectors and creation/
+editing with dates, search and pages. Local full suites passed 118 SQLite/backend
+and 52 PG tests; later focused hierarchy suite passed 11 after migration-safety
+and strict-date cases. Frontend 35 and browser 54 passed. Windows safety passed
+29 with one opt-in skip. Restricted private-schema create/list/edit/audit proof,
+Ruff/mypy/tsc/build/actionlint/pip-audit passed. Hosted evidence pending this branch.
+The unpatched picomatch full-audit failure remains enforced. Next development is
+client identities and branch engagements. Exact evidence/changed areas: P1-02.md.
+Live migration, Supabase Auth, review and deployment remain pending.
 
 ## P1-02 company registry — 2026-11-18
 

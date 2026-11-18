@@ -21,6 +21,7 @@ from app.observability import (
     error_response,
     logger,
 )
+from app.organizations.hierarchy_routes import router as hierarchy_router
 from app.organizations.routes import router as organizations_router
 
 
@@ -67,6 +68,7 @@ def create_app() -> FastAPI:
     api.add_middleware(RequestDiagnostics)
     api.include_router(identity_router)
     api.include_router(organizations_router)
+    api.include_router(hierarchy_router)
 
     @api.exception_handler(StarletteHTTPException)
     async def http_error(request: Request, exc: StarletteHTTPException) -> JSONResponse:

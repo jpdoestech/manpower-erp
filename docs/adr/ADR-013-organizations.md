@@ -1,5 +1,18 @@
 # ADR-013 — Organizational identities, engagements and bootstrap scope
 
+2026-11-18 head-office/branch development amendment adds composite company/parent
+foreign keys, immutable identities/start dates, bounded effective periods and
+append-only hierarchy snapshots. An explicit false-by-default manage_hierarchy
+flag extends a single company grant through the protected operator process.
+Existing registry grants confer no hierarchy access until that operation.
+API and PostgreSQL RLS require both the active grant and capability. Company-row
+locking serializes hierarchy changes and registry deactivation. Parent period
+changes cannot exclude child history, and a head office with active branches
+cannot be inactivated. Runtime column privileges prevent parent reassignment.
+SQLite retains serialized transactions and shared service validation. Hierarchy
+events and restrictive references preserve old relationships. These are
+development decisions under continued-build authority, pending human review.
+
 2026-11-18 implementation amendment under explicit continued-development authority.
 Company registry and narrowly scoped operator grants are implemented for review.
 Remaining hierarchy and tax-profile design below remains proposed. Human security

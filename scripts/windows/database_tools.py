@@ -93,6 +93,9 @@ def validate(root: Path, path: Path) -> None:
             "org_companies",
             "org_company_grants",
             "org_company_events",
+            "org_head_offices",
+            "org_branches",
+            "org_hierarchy_events",
         }.issubset(tables):
             raise RuntimeError("Required identity schema is missing.")
         guards = {
@@ -104,6 +107,8 @@ def validate(root: Path, path: Path) -> None:
             {
                 "org_company_events_immutable_update",
                 "org_company_events_immutable_delete",
+                "org_hierarchy_events_immutable_update",
+                "org_hierarchy_events_immutable_delete",
             }
         )
         for table in (
@@ -189,7 +194,7 @@ def checkpoint(path: Path) -> None:
 def revoke_restored_capabilities(path: Path) -> None:
     now = datetime.now(UTC).strftime("%Y-%m-%d %H:%M:%S.%f")
     with connect(path, readonly=False) as db:
-        db.execute("UPDATE org_company_grants SET is_active=0")
+        db.execute("UPDATE org_company_grants SET is_active=0, manage_hierarchy=0")
         db.execute(
             "UPDATE auth_sessions SET revoked_at=? WHERE revoked_at IS NULL", (now,)
         )
