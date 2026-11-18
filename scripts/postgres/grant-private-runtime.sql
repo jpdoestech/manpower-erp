@@ -7,7 +7,7 @@ BEGIN
         RAISE EXCEPTION 'Run as erp_migrator with the private search path';
     END IF;
     IF (SELECT array_agg(version_num) FROM erp_private.alembic_version)
-        IS DISTINCT FROM ARRAY['0004_sqlite_constraints']::varchar[] THEN
+        IS DISTINCT FROM ARRAY['0005_company_registry']::varchar[] THEN
         RAISE EXCEPTION 'Unexpected Alembic revision. Review runtime privileges before proceeding';
     END IF;
 END
@@ -18,5 +18,8 @@ GRANT SELECT, INSERT, UPDATE ON erp_private.auth_users, erp_private.auth_session
     erp_private.auth_password_resets TO erp_runtime;
 GRANT DELETE ON erp_private.auth_login_limits TO erp_runtime;
 GRANT INSERT, SELECT (created_at) ON erp_private.auth_events TO erp_runtime;
+GRANT SELECT ON erp_private.org_companies, erp_private.org_company_grants TO erp_runtime;
+GRANT UPDATE (legal_name, is_active, version, updated_at) ON erp_private.org_companies TO erp_runtime;
+GRANT INSERT, SELECT (created_at) ON erp_private.org_company_events TO erp_runtime;
 
 COMMIT;

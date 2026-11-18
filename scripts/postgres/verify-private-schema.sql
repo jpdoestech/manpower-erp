@@ -23,6 +23,16 @@ BEGIN
         RAISE EXCEPTION 'Unexpected ERP runtime privileges';
     END IF;
 
+    IF (SELECT count(*) FROM pg_class WHERE relnamespace = 'erp_private'::regnamespace
+        AND relname IN ('org_companies', 'org_company_grants', 'org_company_events')
+        AND relrowsecurity) <> 3
+        OR has_table_privilege('erp_runtime', 'erp_private.org_company_grants',
+                              'INSERT, UPDATE, DELETE, TRUNCATE')
+        OR has_table_privilege('erp_runtime', 'erp_private.org_companies', 'INSERT, DELETE, TRUNCATE')
+        OR has_table_privilege('erp_runtime', 'erp_private.org_company_events', 'UPDATE, DELETE, TRUNCATE') THEN
+        RAISE EXCEPTION 'Unexpected company isolation or provisioning privileges';
+    END IF;
+
     IF EXISTS (
         SELECT 1 FROM pg_roles r CROSS JOIN pg_class c
         JOIN pg_namespace n ON n.oid = c.relnamespace

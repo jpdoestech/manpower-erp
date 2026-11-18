@@ -81,6 +81,18 @@ class DatabaseTools(unittest.TestCase):
                 data.replace(self.root, action, local.migrate, name)
 
     def test_live_backup_restore_preserves_uuid_audit_session_and_guards(self) -> None:
+        company_id = uuid4().hex
+        with data.connect(self.path, readonly=False) as db:
+            db.execute(
+                "INSERT INTO org_companies (id,code,legal_name,version) "
+                "VALUES (?,?,?,1)",
+                (company_id, "TEST", "Synthetic Company"),
+            )
+            db.execute(
+                "INSERT INTO org_company_grants (company_id,user_id) VALUES (?,?)",
+                (company_id, self.user_id),
+            )
+            db.commit()
         with data.connect(self.path, readonly=False) as live:
             live.execute("PRAGMA journal_mode=WAL")
             live.execute(
@@ -98,6 +110,12 @@ class DatabaseTools(unittest.TestCase):
         recovery = sorted(data.backups(self.root).glob("*.sqlite3"))
         self.assertTrue(any(self.rows(path)[0] == 2 for path in recovery))
         with data.connect(self.path, readonly=False) as db:
+            self.assertEqual(
+                db.execute("SELECT is_active FROM org_company_grants").fetchone()[0], 0
+            )
+            self.assertEqual(
+                db.execute("SELECT id FROM org_companies").fetchone()[0], company_id
+            )
             self.assertIsNotNone(
                 db.execute("SELECT revoked_at FROM auth_sessions").fetchone()[0]
             )

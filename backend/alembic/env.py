@@ -3,6 +3,7 @@ from sqlalchemy.exc import SQLAlchemyError
 from alembic import context
 from app.database import Base, create_database_engine, database_url
 from app.identity import models  # noqa: F401 -- register identity metadata
+from app.organizations import models as org_models  # noqa: F401 -- register metadata
 
 target_metadata = Base.metadata
 

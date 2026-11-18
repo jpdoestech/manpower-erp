@@ -18,7 +18,8 @@ BEGIN
         SELECT 1 FROM pg_class c JOIN pg_namespace n ON n.oid = c.relnamespace
         WHERE n.nspname <> 'erp_private'
           AND c.relname IN ('alembic_version', 'auth_users', 'auth_sessions', 'auth_login_limits',
-                           'auth_events', 'auth_account_changes', 'auth_password_resets')
+                           'auth_events', 'auth_account_changes', 'auth_password_resets',
+                           'org_companies', 'org_company_grants', 'org_company_events')
     ) THEN
         RAISE EXCEPTION 'ERP objects already exist outside the private schema';
     END IF;

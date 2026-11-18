@@ -31,6 +31,7 @@ export function AuthPanel({
     signOut: () => void,
     busy: boolean,
     error: string,
+    csrfToken: string,
   ) => ReactNode;
   renderAnonymous?: (panel: ReactNode) => ReactNode;
 } = {}) {
@@ -219,6 +220,7 @@ export function AuthPanel({
         () => void signOut(),
         busy,
         error,
+        account.csrf_token,
       )
     : !account && renderAnonymous
       ? renderAnonymous(panel)

@@ -1,5 +1,12 @@
 # Decision Log (ADRs Index)
 
+2026-11-18 user explicitly authorized further isolated development and deferred
+review. ADR-013 has a company-registry implementation amendment with explicit
+operator grants, versioned writes, immutable company events, service isolation and
+PostgreSQL non-owner RLS. Scope excludes tax policy and the remaining hierarchy.
+Human security decisions and main integration remain pending. Local restore now
+revokes company grants to prevent restoration of previously removed access.
+
 CR-002C preparation (2026-11-04): [ADR-017](../docs/adr/ADR-017-auth-providers.md)
 is PROPOSED ONLY, with [strategy](../docs/AUTH_PROVIDER_STRATEGY.md) and detailed
 [plan/gates](CR-002C.md). Recommend explicit adapters and an encrypted backend

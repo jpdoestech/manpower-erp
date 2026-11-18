@@ -2,6 +2,17 @@
 
 ## P1-01 implemented access surface
 
+P1-02 development slice (2026-11-18) adds GET /api/companies and GET/PATCH
+/api/companies/{company_id}. A current active identity plus an explicit active
+company registry grant is required for each resource. Lists filter before search
+and pagination. Cross-company and absent resources return the same 404. PATCH
+requires Origin/CSRF and a matching version. Company creation and grant/revoke
+remain trusted-operator CLI operations, with no public grant API or implicit
+Super Admin company permissions. PostgreSQL runtime RLS uses transaction-local
+authenticated user context. Owners and BYPASSRLS roles are privileged operators
+outside that boundary. SQLite retains service authorization. Local restore
+revokes restored company grants. Review remains pending for this additional surface.
+
 CR-002C planning adds no access surface. Proposed ADR-017/provider strategy keeps
 internal ERP UUID/current grants separate from external identity. Cloud links,
 reauthentication/refresh/recovery and company deny-all foundations require explicit
