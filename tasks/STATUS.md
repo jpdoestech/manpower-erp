@@ -5,7 +5,7 @@ Current requested milestone: P1-02 company registry development slice
 Current task status: IN_PROGRESS; implementation tested, dependency audit finding open, human acceptance pending
 Repository inspected: YES; connector verifies all original remote heads including main b3517d3; CLI fetch fails; RC starts at 2232702
 Implemented code: existing foundations plus company registry, explicit company grants and scoped UI; remaining hierarchy and finance modules outstanding
-Validated requirements: UI-001 8c0f50c has 10/10 hosted checks; 110 unit/SQLite, 42 PG, 27 frontend, 27 browser and 30 Windows safety tests pass
+Validated requirements: implementation aa19dee has passing backend 114/PG 47, frontend 30/browser 36 and Windows 30 tests; frontend CI fails dependency audit
 
 ## P1-02 company registry — 2026-11-18
 
@@ -32,8 +32,12 @@ Open security finding GHSA-fc5q-39xc-vjpf affects development picomatch 4.0.7 vi
 Vite/Vitest. npm audit reports six high dependency findings. npm registry reports
 4.0.7 as latest; the reviewed advisory lists no patch. Full audit remains enforced.
 Production dependency audit reports zero and pip-audit reports no known findings.
-No dependency override or audit suppression introduced. Hosted CI pending this
-branch. Docker is unavailable locally; Compose checks require hosted CI. Human
+No dependency override or audit suppression introduced. Hosted CI at aa19dee
+completed with eight jobs passing and two frontend jobs failing the audit.
+Backend ran 114/47 tests. Frontend component/browser steps passed 30/36 tests,
+and Windows passed 30 cases including all nine native BAT commands. Compose
+passed migrations and authentication/recovery/persistence. Full evidence is in
+P1-02.md and draft PR #14. Docker is unavailable locally. Human
 P1-01/security acceptance remains pending. No live Supabase migration or deployment.
 
 Changed areas include backend organizations/migration/tests, frontend registry/
