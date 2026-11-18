@@ -1,4 +1,5 @@
 import { type ReactNode, useRef, useState } from "react";
+import { Companies } from "../Companies";
 import {
   Badge,
   Button,
@@ -20,6 +21,7 @@ export function ApplicationShell({
   status,
   theme,
   toggleTheme,
+  csrfToken,
 }: {
   username: string;
   accountPanel: ReactNode;
@@ -29,6 +31,7 @@ export function ApplicationShell({
   status: string;
   theme: string;
   toggleTheme: () => void;
+  csrfToken: string;
 }) {
   const [page, setPage] = useState<Page>("dashboard");
   const [collapsed, setCollapsed] = useState(false);
@@ -159,10 +162,10 @@ export function ApplicationShell({
                 disabled
                 aria-describedby="context-help"
               >
-                <option>No authorized context</option>
+                <option>Branch setup pending</option>
               </select>
               <span id="context-help" className="sr-only">
-                Company and branch scope APIs are not available. Selection never
+                Branch context is awaiting hierarchy setup. Selection never
                 grants access.
               </span>
             </div>
@@ -251,8 +254,8 @@ export function ApplicationShell({
                 <div>
                   <h2>Your company workspace starts here</h2>
                   <p>
-                    Organizational setup is awaiting approved scope APIs. No
-                    company or financial access is granted by signing in.
+                    Open Company Management to view the companies explicitly
+                    assigned to your account.
                   </p>
                 </div>
                 <Badge>Setup pending</Badge>
@@ -283,8 +286,7 @@ export function ApplicationShell({
                     <div>
                       <h3>Company context</h3>
                       <p>
-                        Authorized company and branch scopes are not available
-                        yet.
+                        Manage your authorized legal companies in the registry.
                       </p>
                     </div>
                     <Badge>Pending</Badge>
@@ -324,7 +326,7 @@ export function ApplicationShell({
                     </div>
                     <div>
                       <dt>Company scope</dt>
-                      <dd>Unavailable</dd>
+                      <dd>Explicit grants</dd>
                     </div>
                     <div>
                       <dt>Business modules</dt>
@@ -375,7 +377,9 @@ export function ApplicationShell({
                           <Badge key="availability">
                             {module.id === "administration"
                               ? "Access unavailable"
-                              : "Not implemented"}
+                              : module.id === "companies"
+                                ? "Company registry"
+                                : "Not implemented"}
                           </Badge>,
                         ],
                       }))}
@@ -397,7 +401,9 @@ export function ApplicationShell({
                             <small>
                               {module.id === "administration"
                                 ? "Access unavailable"
-                                : "Not implemented"}
+                                : module.id === "companies"
+                                  ? "Company registry"
+                                  : "Not implemented"}
                             </small>
                           </span>
                           <Icon name="arrow" />
@@ -421,6 +427,8 @@ export function ApplicationShell({
               </div>
               <div className="card account-card">{accountPanel}</div>
             </>
+          ) : page === "companies" ? (
+            <Companies csrfToken={csrfToken} />
           ) : page === "reference" ? (
             <Reference />
           ) : (
@@ -492,7 +500,8 @@ export function ApplicationShell({
           onClose={() => setMobileNavigation(false)}
         >
           <p className="small muted">
-            Business destinations are previews. No company access is granted.
+            Company Management uses your authorized company grants. Other
+            modules show previews.
           </p>
           <nav
             aria-label="Mobile module navigation"
@@ -509,7 +518,11 @@ export function ApplicationShell({
                 {module.label}
                 {module.id !== "dashboard" && (
                   <Badge>
-                    {module.id === "administration" ? "Unavailable" : "Preview"}
+                    {module.id === "administration"
+                      ? "Unavailable"
+                      : module.id === "companies"
+                        ? "Registry"
+                        : "Preview"}
                   </Badge>
                 )}
               </Button>
@@ -548,7 +561,9 @@ export function ApplicationShell({
                     <Badge>
                       {module.id === "dashboard"
                         ? "Workspace"
-                        : "Not implemented"}
+                        : module.id === "companies"
+                          ? "Company registry"
+                          : "Not implemented"}
                     </Badge>
                   </button>
                 </li>

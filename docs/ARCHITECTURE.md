@@ -10,6 +10,13 @@ React + TypeScript frontend, Python FastAPI backend, PostgreSQL, managed object 
 
 ## Modules
 
+2026-11-18 P1-02 adds the first organizations slice, a company registry with
+explicit operator-provisioned grants, scoped API queries and PostgreSQL RLS.
+Company IDs/codes are stable, registry edits use optimistic versions, and company
+events preserve the old/new registry values. Company access is independent of
+technical administrator capability. See ADR-013 and docs/COMPANY_REGISTRY.md.
+Earlier planning descriptions below describe the previous foundation state.
+
 UI-001 introduces the independent frontend shell/design system (ADR-016).
 See FRONTEND_ARCHITECTURE.md and UI_UX_DESIGN_SYSTEM.md. No organization schema,
 scopes, financial workflow or authentication provider changes accompany it.

@@ -1,5 +1,28 @@
 # ADR-013 — Organizational identities, engagements and bootstrap scope
 
+2026-11-18 implementation amendment under explicit continued-development authority.
+Company registry and narrowly scoped operator grants are implemented for review.
+Remaining hierarchy and tax-profile design below remains proposed. Human security
+acceptance is pending.
+
+The first slice uses stable company UUID/code, mutable registry name/status with
+optimistic version checks, explicit per-user company grants, and an append-only
+company event log. The API cannot provision or modify grants. Technical admin
+capability confers no company access. Operator provisioning events record a null
+application actor and an explicit operator event kind, with the target user as
+subject. Operator OS/DB custody is the trust boundary for these operations.
+
+PostgreSQL RLS derives the user from a transaction-local value set by FastAPI after
+session validation. Runtime must be a non-owner without BYPASSRLS or grant DML.
+Schema owners remain trusted migrators/provisioning operators. SQLite uses the
+same mandatory service filters within its existing serialized transactions.
+Tests verify ungranted reads, scoped reads/updates and context reset across pooled
+transactions as a non-owner. This establishes the company registry boundary only.
+Scoped hierarchy permissions and financial approval remain future tasks.
+
+Restore revokes all restored company grants while preserving companies and audit
+history. A trusted operator must regrant reviewed access after local recovery.
+
 2026-11-04. PROPOSED ONLY; P1-02 implementation blocked on P1-01 human security
 acceptance. This does not amend any implemented access rights or database schema.
 

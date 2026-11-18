@@ -17,6 +17,18 @@ async function api(page: Page, signedIn: boolean) {
           csrf_token: "a".repeat(64),
         },
       });
+    if (path === "/api/companies" && signedIn)
+      return route.fulfill({
+        json: [
+          {
+            id: "browser-company",
+            code: "DEMO",
+            legal_name: "Synthetic Test Company",
+            is_active: true,
+            version: 1,
+          },
+        ],
+      });
     return route.fulfill({ status: 401, json: {} });
   });
 }
@@ -33,6 +45,47 @@ async function accessible(page: Page) {
     .analyze();
   expect(results.violations).toEqual([]);
 }
+
+test("company registry and edit dialog fit all devices", async ({
+  page,
+}, testInfo) => {
+  await api(page, true);
+  await page.goto("/");
+  await expect(
+    page.getByRole("heading", { name: "Workspace overview" }),
+  ).toBeVisible();
+  if ((page.viewportSize()?.width ?? 0) <= 600) {
+    await page.getByRole("button", { name: "Open navigation" }).click();
+    await page
+      .getByRole("dialog")
+      .getByRole("button", { name: /Company Management/ })
+      .click();
+  } else {
+    await page
+      .getByRole("navigation", { name: "Primary navigation" })
+      .getByRole("button", { name: "Company Management" })
+      .click();
+  }
+  await expect(
+    page.getByRole("heading", { name: "Synthetic Test Company" }),
+  ).toBeVisible();
+  await accessible(page);
+  await noOverflow(page);
+  await page
+    .getByRole("button", { name: "Edit Synthetic Test Company" })
+    .click();
+  await expect(page.getByRole("dialog")).toBeVisible();
+  await accessible(page);
+  await noOverflow(page);
+  await page.screenshot({
+    path: testInfo.outputPath("company-edit.png"),
+    fullPage: false,
+  });
+  await page.keyboard.press("Escape");
+  await expect(
+    page.getByRole("button", { name: "Edit Synthetic Test Company" }),
+  ).toBeFocused();
+});
 
 test("login fits, labels inputs, hides navigation and supports both themes", async ({
   page,

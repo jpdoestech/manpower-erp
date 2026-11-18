@@ -53,9 +53,17 @@ export function App() {
 
   return (
     <AuthPanel
-      renderAuthenticated={(panel, username, signOut, busy, error) => (
+      renderAuthenticated={(
+        panel,
+        username,
+        signOut,
+        busy,
+        error,
+        csrfToken,
+      ) => (
         <ApplicationShell
           accountPanel={panel}
+          csrfToken={csrfToken}
           username={username}
           signOut={signOut}
           busy={busy}

@@ -33,6 +33,8 @@ def test_openapi_declares_bootstrap_contract() -> None:
     schema = client.get("/openapi.json").json()
     assert set(schema["paths"]) == {
         "/api/bootstrap",
+        "/api/companies",
+        "/api/companies/{company_id}",
         "/api/health/live",
         "/api/health/ready",
         "/api/auth/login",

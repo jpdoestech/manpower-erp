@@ -90,6 +90,9 @@ def validate(root: Path, path: Path) -> None:
             "auth_login_limits",
             "auth_account_changes",
             "auth_password_resets",
+            "org_companies",
+            "org_company_grants",
+            "org_company_events",
         }.issubset(tables):
             raise RuntimeError("Required identity schema is missing.")
         guards = {
@@ -97,6 +100,12 @@ def validate(root: Path, path: Path) -> None:
             for row in db.execute("SELECT name FROM sqlite_master WHERE type='trigger'")
         }
         expected = {"auth_events_immutable_update", "auth_events_immutable_delete"}
+        expected.update(
+            {
+                "org_company_events_immutable_update",
+                "org_company_events_immutable_delete",
+            }
+        )
         for table in (
             "auth_users",
             "auth_sessions",
@@ -180,6 +189,7 @@ def checkpoint(path: Path) -> None:
 def revoke_restored_capabilities(path: Path) -> None:
     now = datetime.now(UTC).strftime("%Y-%m-%d %H:%M:%S.%f")
     with connect(path, readonly=False) as db:
+        db.execute("UPDATE org_company_grants SET is_active=0")
         db.execute(
             "UPDATE auth_sessions SET revoked_at=? WHERE revoked_at IS NULL", (now,)
         )

@@ -1524,3 +1524,63 @@ dialog::backdrop {
     font-size: 16px;
   }
 }
+
+.company-registry {
+  padding: var(--space-5, 20px);
+}
+.company-search {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(140px, 200px) auto;
+  gap: 12px;
+  align-items: end;
+}
+.company-search .field {
+  min-width: 0;
+}
+.company-list {
+  list-style: none;
+  padding: 0;
+  margin: 20px 0;
+}
+.company-list li {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  padding: 14px 0;
+  border-bottom: 1px solid var(--border);
+}
+.company-list li > div {
+  flex: 1;
+  min-width: 0;
+}
+.company-list h2 {
+  font-size: 15px;
+  margin: 3px 0;
+  overflow-wrap: anywhere;
+}
+.company-pagination {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  margin-top: 20px;
+}
+.company-edit {
+  display: grid;
+  gap: 16px;
+}
+@media (max-width: 600px) {
+  .company-search {
+    grid-template-columns: minmax(0, 1fr);
+  }
+  .company-list li {
+    flex-wrap: wrap;
+    gap: 10px;
+  }
+  .company-list li > div {
+    flex-basis: calc(100% - 90px);
+  }
+  .company-list li > button {
+    width: 100%;
+  }
+}
