@@ -31,10 +31,13 @@ def set_actor(db: Session, user_id: UUID) -> None:
         )
 
 
-def authorized_company_ids(user_id: UUID) -> Select[UUID]:
-    return select(CompanyGrant.company_id).where(
+def authorized_company_ids(user_id: UUID, *, hierarchy: bool = False) -> Select[UUID]:
+    query = select(CompanyGrant.company_id).where(
         CompanyGrant.user_id == user_id, CompanyGrant.is_active.is_(True)
     )
+    if hierarchy:
+        query = query.where(CompanyGrant.manage_hierarchy.is_(True))
+    return query
 
 
 def company_for_user(db: Session, user_id: UUID, company_id: UUID) -> Company:
@@ -136,11 +139,34 @@ def set_grant(db: Session, company_id: UUID, username: str, active: bool) -> Non
         grant = CompanyGrant(company_id=company_id, user_id=user.id)
         db.add(grant)
     grant.is_active = active
+    if not active:
+        grant.manage_hierarchy = False
     db.add(
         CompanyEvent(
             company_id=company_id,
             subject_id=user.id,
             kind="operator_grant" if active else "operator_revoke",
+            request_id=uuid4(),
+        )
+    )
+    db.commit()
+
+
+def set_hierarchy_grant(
+    db: Session, company_id: UUID, username: str, active: bool
+) -> None:
+    user = db.scalar(select(User).where(User.username == normalize_username(username)))
+    grant = db.get(CompanyGrant, (company_id, user.id)) if user else None
+    if grant is None or (
+        active and (not user or not user.is_active or not grant.is_active)
+    ):
+        raise ValueError("Active company registry grant required")
+    grant.manage_hierarchy = active
+    db.add(
+        CompanyEvent(
+            company_id=company_id,
+            subject_id=user.id if user else None,
+            kind="operator_hierarchy_grant" if active else "operator_hierarchy_revoke",
             request_id=uuid4(),
         )
     )

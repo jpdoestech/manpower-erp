@@ -1,5 +1,12 @@
 # Decision Log (ADRs Index)
 
+2026-11-18 head-office/branch slice continues the authorized isolated P1-02 work.
+ADR-013 now documents explicit hierarchy grants, compound company/parent FKs,
+stable identifiers/start dates, versioned edits and immutable audit snapshots.
+Company-row locks protect parent/child date and status changes. Existing registry
+grants gain no additional rights. Runtime column grants and RLS enforce the
+boundary on PostgreSQL. Human decisions remain pending.
+
 2026-11-18 user explicitly authorized further isolated development and deferred
 review. ADR-013 has a company-registry implementation amendment with explicit
 operator grants, versioned writes, immutable company events, service isolation and

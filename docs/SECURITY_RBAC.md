@@ -2,6 +2,18 @@
 
 ## P1-01 implemented access surface
 
+Head-office/branch development adds GET/POST
+/api/companies/{company_id}/head-offices and /branches, plus GET/PATCH on each
+record. These require the separate active manage_hierarchy capability in the
+explicit company grant. Registry-only users and technical admins are denied.
+POST/PATCH retain CSRF/Origin and strict payload validation. Operators grant or
+revoke this capability through audited CLI operations. Parent identifiers and
+company scopes are checked server-side and by composite foreign keys. PostgreSQL
+RLS denies unscoped/other-user operations. Runtime cannot grant itself access,
+change stable parents, delete records or modify history. Restore clears the
+new capability. Fine branch/client roles and independent workflow approvals
+remain future scoped-RBAC work. This surface remains pending review.
+
 P1-02 development slice (2026-11-18) adds GET /api/companies and GET/PATCH
 /api/companies/{company_id}. A current active identity plus an explicit active
 company registry grant is required for each resource. Lists filter before search

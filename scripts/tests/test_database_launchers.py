@@ -82,6 +82,7 @@ class DatabaseTools(unittest.TestCase):
 
     def test_live_backup_restore_preserves_uuid_audit_session_and_guards(self) -> None:
         company_id = uuid4().hex
+        office_id, branch_id, hierarchy_event_id = uuid4().hex, uuid4().hex, uuid4().hex
         with data.connect(self.path, readonly=False) as db:
             db.execute(
                 "INSERT INTO org_companies (id,code,legal_name,version) "
@@ -89,8 +90,28 @@ class DatabaseTools(unittest.TestCase):
                 (company_id, "TEST", "Synthetic Company"),
             )
             db.execute(
-                "INSERT INTO org_company_grants (company_id,user_id) VALUES (?,?)",
+                "INSERT INTO org_company_grants "
+                "(company_id,user_id,manage_hierarchy) VALUES (?,?,1)",
                 (company_id, self.user_id),
+            )
+            db.execute(
+                "INSERT INTO org_head_offices "
+                "(id,company_id,code,name,valid_from,version,created_by) "
+                "VALUES (?,?, 'HO', 'Head Office', '2020-01-01', 1, ?)",
+                (office_id, company_id, self.user_id),
+            )
+            db.execute(
+                "INSERT INTO org_branches "
+                "(id,company_id,head_office_id,code,name,valid_from,version,"
+                "created_by) "
+                "VALUES (?,?,?, 'BR', 'Branch', '2020-01-01', 1, ?)",
+                (branch_id, company_id, office_id, self.user_id),
+            )
+            db.execute(
+                "INSERT INTO org_hierarchy_events "
+                "(id,company_id,branch_id,actor_id,kind,after_state,request_id) "
+                "VALUES (?,?,?,?, 'branch_created', '{}', ?)",
+                (hierarchy_event_id, company_id, branch_id, self.user_id, uuid4().hex),
             )
             db.commit()
         with data.connect(self.path, readonly=False) as live:
@@ -114,6 +135,20 @@ class DatabaseTools(unittest.TestCase):
                 db.execute("SELECT is_active FROM org_company_grants").fetchone()[0], 0
             )
             self.assertEqual(
+                db.execute(
+                    "SELECT manage_hierarchy FROM org_company_grants"
+                ).fetchone()[0],
+                0,
+            )
+            self.assertEqual(
+                db.execute("SELECT head_office_id FROM org_branches").fetchone()[0],
+                office_id,
+            )
+            self.assertEqual(
+                db.execute("SELECT id FROM org_hierarchy_events").fetchone()[0],
+                hierarchy_event_id,
+            )
+            self.assertEqual(
                 db.execute("SELECT id FROM org_companies").fetchone()[0], company_id
             )
             self.assertIsNotNone(
@@ -131,6 +166,8 @@ class DatabaseTools(unittest.TestCase):
             )
             with self.assertRaisesRegex(sqlite3.IntegrityError, "immutable"):
                 db.execute("UPDATE auth_events SET kind='tampered'")
+            with self.assertRaisesRegex(sqlite3.IntegrityError, "immutable"):
+                db.execute("DELETE FROM org_hierarchy_events")
             self.assertEqual(db.execute("PRAGMA foreign_keys").fetchone()[0], 1)
         with patch.object(local, "ROOT", self.root):
             local.migrate()

@@ -1,5 +1,6 @@
 import { type ReactNode, useRef, useState } from "react";
 import { Companies } from "../Companies";
+import { Hierarchy } from "../Hierarchy";
 import {
   Badge,
   Button,
@@ -11,6 +12,8 @@ import {
 import { Icon } from "../ui/Icon";
 import { Reference } from "../ui/Reference";
 import { modules, type Page } from "./navigation";
+
+const registryPages = new Set(["companies", "head-offices", "branches"]);
 
 export function ApplicationShell({
   username,
@@ -162,11 +165,11 @@ export function ApplicationShell({
                 disabled
                 aria-describedby="context-help"
               >
-                <option>Branch setup pending</option>
+                <option>Select scope in module</option>
               </select>
               <span id="context-help" className="sr-only">
-                Branch context is awaiting hierarchy setup. Selection never
-                grants access.
+                Choose the company within each organization module. Selection
+                never grants access.
               </span>
             </div>
           </div>
@@ -377,7 +380,7 @@ export function ApplicationShell({
                           <Badge key="availability">
                             {module.id === "administration"
                               ? "Access unavailable"
-                              : module.id === "companies"
+                              : registryPages.has(module.id)
                                 ? "Company registry"
                                 : "Not implemented"}
                           </Badge>,
@@ -401,7 +404,7 @@ export function ApplicationShell({
                             <small>
                               {module.id === "administration"
                                 ? "Access unavailable"
-                                : module.id === "companies"
+                                : registryPages.has(module.id)
                                   ? "Company registry"
                                   : "Not implemented"}
                             </small>
@@ -429,6 +432,8 @@ export function ApplicationShell({
             </>
           ) : page === "companies" ? (
             <Companies csrfToken={csrfToken} />
+          ) : page === "head-offices" || page === "branches" ? (
+            <Hierarchy key={page} kind={page} csrfToken={csrfToken} />
           ) : page === "reference" ? (
             <Reference />
           ) : (
@@ -520,7 +525,7 @@ export function ApplicationShell({
                   <Badge>
                     {module.id === "administration"
                       ? "Unavailable"
-                      : module.id === "companies"
+                      : registryPages.has(module.id)
                         ? "Registry"
                         : "Preview"}
                   </Badge>
@@ -561,7 +566,7 @@ export function ApplicationShell({
                     <Badge>
                       {module.id === "dashboard"
                         ? "Workspace"
-                        : module.id === "companies"
+                        : registryPages.has(module.id)
                           ? "Company registry"
                           : "Not implemented"}
                     </Badge>

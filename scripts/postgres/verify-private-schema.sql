@@ -24,13 +24,28 @@ BEGIN
     END IF;
 
     IF (SELECT count(*) FROM pg_class WHERE relnamespace = 'erp_private'::regnamespace
-        AND relname IN ('org_companies', 'org_company_grants', 'org_company_events')
-        AND relrowsecurity) <> 3
+        AND relname IN ('org_companies', 'org_company_grants', 'org_company_events',
+                        'org_head_offices', 'org_branches', 'org_hierarchy_events')
+        AND relrowsecurity) <> 6
         OR has_table_privilege('erp_runtime', 'erp_private.org_company_grants',
                               'INSERT, UPDATE, DELETE, TRUNCATE')
         OR has_table_privilege('erp_runtime', 'erp_private.org_companies', 'INSERT, DELETE, TRUNCATE')
         OR has_table_privilege('erp_runtime', 'erp_private.org_company_events', 'UPDATE, DELETE, TRUNCATE') THEN
         RAISE EXCEPTION 'Unexpected company isolation or provisioning privileges';
+    END IF;
+
+    IF has_table_privilege('erp_runtime', 'erp_private.org_head_offices', 'DELETE, TRUNCATE')
+        OR has_table_privilege('erp_runtime', 'erp_private.org_branches', 'DELETE, TRUNCATE')
+        OR has_table_privilege('erp_runtime', 'erp_private.org_hierarchy_events', 'UPDATE, DELETE, TRUNCATE')
+        OR EXISTS (
+            SELECT 1 FROM pg_attribute a JOIN pg_class c ON c.oid=a.attrelid
+            WHERE c.relnamespace='erp_private'::regnamespace
+              AND c.relname IN ('org_head_offices', 'org_branches')
+              AND a.attname IN ('id', 'company_id', 'head_office_id', 'code',
+                               'valid_from', 'created_by', 'created_at')
+              AND has_column_privilege('erp_runtime', c.oid, a.attnum, 'UPDATE')
+        ) THEN
+        RAISE EXCEPTION 'Unexpected hierarchy mutation or parent privileges';
     END IF;
 
     IF EXISTS (

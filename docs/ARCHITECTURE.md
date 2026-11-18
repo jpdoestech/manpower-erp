@@ -10,6 +10,13 @@ React + TypeScript frontend, Python FastAPI backend, PostgreSQL, managed object 
 
 ## Modules
 
+The next P1-02 slice adds HeadOffice and Branch with composite company FKs,
+explicit hierarchy capability and effective periods. Stable parent/start-date
+fields and immutable audit snapshots preserve operational history. API writes
+serialize by company and validate active parent/date coverage. PostgreSQL RLS
+requires the same explicit capability, with runtime column grants excluding
+identity/parent changes. See ADR-013 and COMPANY_REGISTRY.md for setup and limits.
+
 2026-11-18 P1-02 adds the first organizations slice, a company registry with
 explicit operator-provisioned grants, scoped API queries and PostgreSQL RLS.
 Company IDs/codes are stable, registry edits use optimistic versions, and company

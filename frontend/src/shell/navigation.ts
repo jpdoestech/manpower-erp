@@ -11,7 +11,7 @@ export const modules = [
     label: "Company Management",
     group: "Organization",
     icon: "building",
-    description: "Independent legal companies and registration profiles.",
+    description: "Legal company registry and explicit organization access.",
   },
   {
     id: "head-offices",
@@ -25,7 +25,7 @@ export const modules = [
     label: "Branches",
     group: "Organization",
     icon: "branch",
-    description: "Operational branches and authorized relationships.",
+    description: "Branches within their legal company and head office.",
   },
   {
     id: "clients",

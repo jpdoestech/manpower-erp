@@ -19,7 +19,8 @@ BEGIN
         WHERE n.nspname <> 'erp_private'
           AND c.relname IN ('alembic_version', 'auth_users', 'auth_sessions', 'auth_login_limits',
                            'auth_events', 'auth_account_changes', 'auth_password_resets',
-                           'org_companies', 'org_company_grants', 'org_company_events')
+                           'org_companies', 'org_company_grants', 'org_company_events',
+                           'org_head_offices', 'org_branches', 'org_hierarchy_events')
     ) THEN
         RAISE EXCEPTION 'ERP objects already exist outside the private schema';
     END IF;
